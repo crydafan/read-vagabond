@@ -4,6 +4,8 @@ import { getChapterDetails, getMetadata } from "../../../lib/db";
 
 const { volume, chapter } = Astro.params;
 
+import Comments from "../../../components/comments"
+
 if (!chapter) {
   return Astro.redirect("/");
 }
@@ -229,6 +231,7 @@ const pages = Array.from(
             />
           ))
         }
+      <Comments client:visible mangaId="vagabond" chapterNumber={chapterNum} />
       </div>
     </div>
 

@@ -12,16 +12,8 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
   const [comments, setComments] = useState([]);
   const [error, setError] = useState(null);
 
-  const submitComment = async (content) => {
-    await axios.post('/api/comments/add', {
-      volume: volumeNumber,
-      chapter: chapterNumber,
-      author: 'Anonymous', // or user name later
-      content,
-    });
-
-    // Reload comments after posting
-    loadComments();
+  const minimizeComments = () => {
+    setLoadingState('idle');
   };
 
   const loadComments = async () => {
@@ -91,12 +83,26 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
             borderRadius: '1rem',
             borderWidth: '2px',
             borderColor: '#0A42C2',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            alignItems: 'center',
           }}
           maxWidth="md"
         >
           <div style={{ color: '#0A42C2', textAlign: 'center' }}>
             <h4>No comments added for this chapter yet</h4>
           </div>
+          <AddComments
+            mangaId={mangaId}
+            chapterNumber={chapterNumber}
+            volumeNumber={volumeNumber}
+            onCommentAdded={(newComment) => {
+              setComments((prev) => [newComment, ...prev]);
+              setLoadingState('loaded');
+            }}
+            variant="blue"
+          />
         </Container>
       );
     case 'loaded':
@@ -116,9 +122,31 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
           maxWidth="xl"
         >
           <div>
-            <Typography variant="h5" sx={{ margin: '10px' }}>
-              Comments ({comments.length})
-            </Typography>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Typography variant="h5" sx={{ margin: '10px' }}>
+                Comments ({comments.length})
+              </Typography>
+              <Button
+                sx={{
+                  fontSize: '28px',
+                  minWidth: '40px',
+                  height: '40px',
+                  color: '#303033',
+                  borderColor: 'black',
+                }}
+                variant="outlined"
+                onClick={minimizeComments}
+              >
+                -
+              </Button>
+            </div>
             <ul
               style={{
                 display: 'flex',
@@ -155,7 +183,16 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
                 </li>
               ))}
             </ul>
-            <AddComments />
+            <AddComments
+              mangaId={mangaId}
+              chapterNumber={chapterNumber}
+              volumeNumber={volumeNumber}
+              onCommentAdded={(newComment) => {
+                setComments((prev) => [newComment, ...prev]);
+                setLoadingState('loaded');
+              }}
+              variant="grey"
+            />
           </div>
         </Container>
       );

@@ -1,5 +1,15 @@
 type Database = D1Database;
 
+export type Comment = {
+  id: number;
+  manga: string;
+  volume: number;
+  chapter: number;
+  author: string;
+  content: string;
+  created_at: string | number;
+};
+
 export async function getMetadata(db: Database) {
   const result = await db
     .prepare(
@@ -8,7 +18,7 @@ export async function getMetadata(db: Database) {
         COUNT(DISTINCT volume) as tankobon,
         COUNT(*) as chapters
       FROM chapters
-    `,
+    `
     )
     .first<{ tankobon: number; chapters: number }>();
 
@@ -29,7 +39,7 @@ export async function getVolumes(db: Database) {
       WHERE volume IS NOT NULL
       GROUP BY volume
       ORDER BY volume ASC
-    `,
+    `
     )
     .all<{
       volume: number;
@@ -44,7 +54,7 @@ export async function getVolumes(db: Database) {
 
 export async function getVolumeDetails(
   db: Database,
-  volumeNumber: string | number,
+  volumeNumber: string | number
 ) {
   const volumeData = await db
     .prepare(
@@ -58,7 +68,7 @@ export async function getVolumeDetails(
       FROM chapters 
       WHERE volume = ?
       GROUP BY volume
-    `,
+    `
     )
     .bind(volumeNumber)
     .first<{
@@ -80,7 +90,7 @@ export async function getVolumeDetails(
       FROM chapters 
       WHERE volume = ? 
       ORDER BY number ASC
-    `,
+    `
     )
     .bind(volumeNumber)
     .all<{
@@ -98,7 +108,7 @@ export async function getVolumeDetails(
 
 export async function getChapterDetails(
   db: Database,
-  chapterNumber: string | number,
+  chapterNumber: string | number
 ) {
   const chapter = await db
     .prepare(`SELECT * FROM chapters WHERE number = ?`)
@@ -115,4 +125,60 @@ export async function getChapterDetails(
     }>();
 
   return chapter;
+}
+
+export async function getChapterComments(
+  db: Database,
+  mangaId: string,
+  chapterNumber: string | number
+): Promise<Comment[]> {
+  const CommentsAPIResponse = await db
+    .prepare(
+      `SELECT *
+       FROM comments
+       WHERE manga = ? AND chapter = ?
+       ORDER BY created_at DESC`
+    )
+    .bind(mangaId, chapterNumber)
+    .all<Comment>();
+
+  if (!CommentsAPIResponse.success) {
+    throw new Error('Failed to fetch chapter comments');
+  }
+
+  return CommentsAPIResponse.results ?? [];
+}
+
+export async function addChapterComment(
+  db: Database,
+  comment: {
+    volume: number;
+    chapter: number;
+    author: string;
+    content: string;
+  }
+) {
+  if (comment.author == undefined || comment.author == '') {
+    comment.author = 'Anonymous';
+  }
+  const result = await db
+    .prepare(
+      `
+      INSERT INTO comments (manga, volume, chapter, author, content)
+      VALUES (?, ?, ?, ?, ?)
+    `
+    )
+    .bind(
+      'vagabond',
+      comment.volume,
+      comment.chapter,
+      comment.author,
+      comment.content
+    )
+    .run();
+
+  return {
+    id: result.meta.last_row_id,
+    ...comment,
+  };
 }

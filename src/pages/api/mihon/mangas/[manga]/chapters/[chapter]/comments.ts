@@ -4,42 +4,38 @@ import type { APIRoute } from 'astro';
 import { getChapterComments } from '../../../../../../../lib/db';
 
 export const GET: APIRoute = async ({ locals, params }) => {
-  const mangaId = params.manga;
   const chapterId = params.chapter;
 
-  if (!mangaId || !chapterId) {
+  if (!chapterId) {
     return new Response(
-      JSON.stringify({ error: 'Missing manga or chapter parameter' }),
+      JSON.stringify({ error: 'Missing chapter parameter' }),
       { status: 400 }
     );
   }
 
   const db = locals.runtime?.env?.vagabond_db;
-
   if (!db) {
     return new Response(JSON.stringify({ error: 'Database not available' }), {
       status: 500,
     });
   }
 
+  const mangaName = 'vagabond';
+  const chapterNumber = Number(chapterId);
+
   try {
-    const comments = await getChapterComments(db, mangaId, chapterId);
+    const comments = await getChapterComments(db, mangaName, chapterNumber);
 
     return new Response(
       JSON.stringify({
-        manga_id: mangaId,
-        chapter_id: chapterId,
+        manga_id: mangaName,
+        chapter_id: chapterNumber,
         comments,
       }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+      { headers: { 'Content-Type': 'application/json' } }
     );
   } catch (err) {
-    console.error('Error fetching comments:', err);
-
+    console.error(err);
     return new Response(JSON.stringify({ error: 'Failed to load comments' }), {
       status: 500,
     });

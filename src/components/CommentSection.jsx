@@ -6,8 +6,10 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import axios from 'axios';
 import AddComments from './addComments';
+import Divider from '@mui/material/Divider';
+import CommentItem from './CommentItem';
 
-const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
+const CommentsSection = ({ mangaId, chapterNumber, volumeNumber }) => {
   const [loadingState, setLoadingState] = useState('idle');
   const [comments, setComments] = useState([]);
   const [error, setError] = useState(null);
@@ -23,12 +25,9 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
     try {
       const response = await axios.get(
         `/api/mihon/mangas/${mangaId}/chapters/${chapterNumber}/comments`
-        // REMOVEME
-        //'https://www.httpbin.org/status/500'
       );
 
       const fetchedComments = response.data?.comments ?? [];
-
       setComments(fetchedComments);
 
       if (fetchedComments.length === 0) {
@@ -41,6 +40,48 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
       setError('Failed to load comments');
       setLoadingState('error');
     }
+  };
+
+  const addReplyRecursive = (comments, parentId, newReply) => {
+    return comments.map((comment) => {
+      if (comment.id === parentId) {
+        return {
+          ...comment,
+          replies: [...(comment.replies ?? []), newReply],
+        };
+      }
+
+      if (comment.replies?.length) {
+        return {
+          ...comment,
+          replies: addReplyRecursive(comment.replies, parentId, newReply),
+        };
+      }
+
+      return comment;
+    });
+  };
+
+  const addReply = (parentId, newReply) => {
+    setComments((prev) => addReplyRecursive(prev, parentId, newReply));
+  };
+
+  const updateLikesRecursive = (comments, commentId, likes, likedByMe) =>
+    comments.map((c) => {
+      if (c.id === commentId) return { ...c, likes, likedByMe };
+
+      if (c.replies?.length) {
+        return {
+          ...c,
+          replies: updateLikesRecursive(c.replies, commentId, likes, likedByMe),
+        };
+      }
+
+      return c;
+    });
+
+  const updateLikes = (commentId, likes) => {
+    setComments((prev) => updateLikesRecursive(prev, commentId, likes));
   };
 
   switch (loadingState) {
@@ -93,6 +134,7 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
           <div style={{ color: '#0A42C2', textAlign: 'center' }}>
             <h4>No comments added for this chapter yet</h4>
           </div>
+          <Divider sx={{ my: 1 }} />
           <AddComments
             mangaId={mangaId}
             chapterNumber={chapterNumber}
@@ -147,42 +189,17 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
                 -
               </Button>
             </div>
-            <ul
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                margin: '10px',
-                padding: 0,
-                listStyle: 'none',
-              }}
-            >
-              {comments.map((comment) => (
-                <li
-                  key={comment.id}
-                  style={{
-                    padding: '12px',
-                    border: '1px solid #E4E4E7',
-                    borderRadius: '8px',
-                    background: '#FAFAFA',
-                  }}
-                >
-                  <div style={{ fontWeight: 600 }}>{comment.author}</div>
-                  <div style={{ fontSize: '14px', marginTop: '4px' }}>
-                    {comment.content}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '12px',
-                      color: '#71717A',
-                      marginTop: '6px',
-                    }}
-                  >
-                    {new Date(comment.created_at).toLocaleString()}
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                onReplyAdded={addReply}
+                onLikeUpdate={updateLikes}
+                parentId={0}
+                chapterNumber={chapterNumber}
+                volumeNumber={volumeNumber}
+              />
+            ))}
             <AddComments
               mangaId={mangaId}
               chapterNumber={chapterNumber}
@@ -237,4 +254,4 @@ const Comments = ({ mangaId, chapterNumber, volumeNumber }) => {
   }
 };
 
-export default Comments;
+export default CommentsSection;

@@ -3,7 +3,7 @@
 import type { APIRoute } from 'astro';
 import { getChapterComments } from '../../../../../../../lib/db';
 
-export const GET: APIRoute = async ({ locals, params }) => {
+export const GET: APIRoute = async ({ request, locals, params }) => {
   const chapterId = params.chapter;
 
   if (!chapterId) {
@@ -12,6 +12,11 @@ export const GET: APIRoute = async ({ locals, params }) => {
       { status: 400 }
     );
   }
+
+  const userId =
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-forwarded-for') ??
+    'anonymous';
 
   const db = locals.runtime?.env?.vagabond_db;
   if (!db) {
@@ -24,7 +29,12 @@ export const GET: APIRoute = async ({ locals, params }) => {
   const chapterNumber = Number(chapterId);
 
   try {
-    const comments = await getChapterComments(db, mangaName, chapterNumber);
+    const comments = await getChapterComments(
+      db,
+      mangaName,
+      chapterNumber,
+      userId
+    );
 
     return new Response(
       JSON.stringify({

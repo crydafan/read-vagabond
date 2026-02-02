@@ -12,24 +12,33 @@ const AddComments = ({
 }) => {
   const [AddState, setAddState] = useState('idle');
   const [Comment, setComment] = useState('');
+  const [Author, setAuthor] = useState('');
 
-  const submitComment = async (content) => {
+  const submitComment = async (comment, author) => {
+    const normalizedAuthor =
+      author === undefined || author === null ? '' : String(author);
+
     const res = await axios.post('/api/comments/add', {
       volume: volumeNumber,
       chapter: chapterNumber,
-      author: 'Anonymous',
-      content,
+      author: normalizedAuthor,
+      content: comment,
+      parent_id: null,
     });
 
     onCommentAdded({
-      id: res.data.id ?? Date.now(), // fallback
-      author: 'Anonymous',
-      content,
+      id: res.data.id,
+      author: res.data.author,
+      content: res.data.content,
       created_at: new Date().toISOString(),
+      likes: 0,
+      likedByMe: 0,
+      replies: [],
     });
 
     setComment('');
     setAddState('idle');
+    setAuthor('');
   };
   const addCommentButton = () => {
     setAddState('writing');
@@ -81,32 +90,71 @@ const AddComments = ({
           }}
           maxWidth="lg"
         >
-          <TextField
-            id="outlined-multiline-static"
-            label="Comment"
-            placeholder="Enter your comment here"
-            value={Comment}
-            fullWidth
-            rows={4}
-            onChange={(e) => setComment(e.target.value)}
-            multiline
-            error={Comment.length > 0 && Comment.length < 3}
-            helperText={
-              Comment.length > 0 && Comment.length < 3
-                ? 'Comment must be at least 3 characters'
-                : ''
-            }
-          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '20px',
+              width: '100%',
+            }}
+          >
+            <TextField
+              id="outlined-multiline-static"
+              label="Comment"
+              placeholder="Enter your comment here"
+              value={Comment}
+              fullWidth
+              rows={4}
+              sx={{ flex: 3 }}
+              onChange={(e) => setComment(e.target.value)}
+              multiline
+              error={Comment.length > 0 && Comment.length < 3}
+              helperText={
+                Comment.length > 0 && Comment.length < 3
+                  ? 'Comment must be at least 3 characters'
+                  : ''
+              }
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  returnToIdle();
+                }
+              }}
+            />
+            <TextField
+              id="outlined-multiline-static"
+              label="Author (Optional)"
+              placeholder="Enter the name you want here"
+              value={Author}
+              sx={{ flex: 1 }}
+              fullWidth
+              onChange={(e) => setAuthor(e.target.value)}
+              error={Author.length > 0 && Author.length < 3}
+              helperText={
+                Author.length > 0 && Author.length < 3
+                  ? 'Author name must be at least 3 characters'
+                  : ''
+              }
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  returnToIdle();
+                }
+              }}
+            />
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
             <Button
               variant="contained"
+              accessKey="return"
               sx={{
                 backgroundColor: '#3DB83D',
                 color: 'white',
                 border: '1px solid #0E8C0E',
                 marginBottom: '20px',
               }}
-              onClick={() => submitComment(Comment)}
+              onClick={() => submitComment(Comment, Author)}
             >
               Submit
             </Button>

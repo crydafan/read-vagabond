@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS comments (
     manga TEXT NOT NULL,
     volume INTEGER NOT NULL,
     chapter INTEGER NOT NULL,
+    parent_id INTEGER,
     author TEXT,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP

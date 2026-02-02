@@ -24,7 +24,8 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "unique-names-generator": "^4.7.1"
   },
   "devDependencies": {
     "wrangler": "^4.59.2"

@@ -2,11 +2,11 @@ import type { APIRoute } from 'astro';
 import { addChapterComment } from '../../../lib/db';
 
 type AddCommentBody = {
-  manga: string;
   volume: number;
   chapter: number;
   author: string;
   content: string;
+  parent_id: Number | null;
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -23,18 +23,22 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response('Invalid JSON', { status: 400 });
   }
 
-  const { volume, chapter, author, content } = body;
+  const { volume, chapter, author, content, parent_id } = body;
 
-  if (!volume || !chapter || !author || !content) {
+  if (!volume || !chapter || !content) {
     return new Response(JSON.stringify({ error: 'Missing required fields' }), {
       status: 400,
     });
   }
 
+  const normalizedParentId =
+    parent_id === null || parent_id === undefined ? null : Number(parent_id);
+
   try {
     const comment = await addChapterComment(db, {
       volume: Number(volume),
       chapter: Number(chapter),
+      parent_id: normalizedParentId,
       author,
       content,
     });

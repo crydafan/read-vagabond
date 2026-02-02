@@ -1,13 +1,22 @@
 type Database = D1Database;
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from 'unique-names-generator';
+
+import type { Config } from 'unique-names-generator';
 
 export type Comment = {
   id: number;
-  manga: string;
-  volume: number;
-  chapter: number;
   author: string;
   content: string;
-  created_at: string | number;
+  created_at: string;
+  parent_id: number | null;
+  likes: number;
+  likedByMe: number; // 0 or 1
+  replies?: Comment[];
 };
 
 export async function getMetadata(db: Database) {
@@ -130,23 +139,52 @@ export async function getChapterDetails(
 export async function getChapterComments(
   db: Database,
   mangaId: string,
-  chapterNumber: string | number
+  chapterNumber: number,
+  userId: string
 ): Promise<Comment[]> {
-  const CommentsAPIResponse = await db
+  const res = await db
     .prepare(
-      `SELECT *
-       FROM comments
-       WHERE manga = ? AND chapter = ?
-       ORDER BY created_at DESC`
+      `
+      SELECT
+        c.*,
+        COUNT(cl.comment_id) AS likes,
+        MAX(CASE WHEN cl.user_id = ? THEN 1 ELSE 0 END) AS likedByMe
+      FROM comments c
+      LEFT JOIN comment_likes cl ON cl.comment_id = c.id
+      WHERE c.manga = ? AND c.chapter = ?
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
+      `
     )
-    .bind(mangaId, chapterNumber)
+    .bind(userId, mangaId, chapterNumber)
     .all<Comment>();
 
-  if (!CommentsAPIResponse.success) {
-    throw new Error('Failed to fetch chapter comments');
+  if (!res.success) {
+    throw new Error('Failed to fetch comments');
   }
 
-  return CommentsAPIResponse.results ?? [];
+  const rows = res.results ?? [];
+
+  const commentMap = new Map<number, Comment & { replies: Comment[] }>();
+
+  rows.forEach((row) => {
+    commentMap.set(row.id, { ...row, replies: [] });
+  });
+
+  const rootComments: Comment[] = [];
+
+  rows.forEach((row) => {
+    if (row.parent_id === 0 || row.parent_id === null) {
+      rootComments.push(commentMap.get(row.id)!);
+    } else {
+      const parent = commentMap.get(row.parent_id);
+      if (parent) {
+        parent.replies.push(commentMap.get(row.id)!);
+      }
+    }
+  });
+
+  return rootComments;
 }
 
 export async function addChapterComment(
@@ -156,29 +194,48 @@ export async function addChapterComment(
     chapter: number;
     author: string;
     content: string;
+    parent_id: null | number;
   }
 ) {
-  if (comment.author == undefined || comment.author == '') {
-    comment.author = 'Anonymous';
+  let author: string;
+  if (
+    comment.author == undefined ||
+    comment.author == '' ||
+    comment.author.toLowerCase() === 'anonymous' ||
+    comment.author === 'test'
+  ) {
+    const customConfig: Config = {
+      dictionaries: [adjectives, colors, animals],
+      separator: '',
+      length: 2,
+      style: 'capital',
+    };
+    author = uniqueNamesGenerator(customConfig);
+  } else {
+    author = comment.author;
   }
   const result = await db
     .prepare(
       `
-      INSERT INTO comments (manga, volume, chapter, author, content)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO comments (manga, volume, chapter, author, content, parent_id)
+      VALUES (?, ?, ?, ?, ?, ?)
     `
     )
     .bind(
       'vagabond',
       comment.volume,
       comment.chapter,
-      comment.author,
-      comment.content
+      author,
+      comment.content,
+      comment.parent_id
     )
     .run();
-
   return {
     id: result.meta.last_row_id,
-    ...comment,
+    volume: comment.volume,
+    chapter: comment.chapter,
+    author,
+    content: comment.content,
+    parent_id: comment.parent_id,
   };
 }

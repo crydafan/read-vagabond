@@ -1,6 +1,46 @@
 import { sql, eq, asc, countDistinct, min, max } from "drizzle-orm";
-import { chaptersTable, volumesTable } from "../db/schema";
+import {
+  artistAlias,
+  authorAlias,
+  chaptersTable,
+  mangasTable,
+  volumesTable,
+} from "../db/schema";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
+
+export const getMangas = async (db: DrizzleD1Database) => {
+  const mangas = await db
+    .select({
+      id: mangasTable.id,
+      title: mangasTable.title,
+      description: mangasTable.description,
+      author: authorAlias.name,
+      artist: artistAlias.name,
+      status: mangasTable.status,
+    })
+    .from(mangasTable)
+    .leftJoin(authorAlias, eq(mangasTable.authorId, authorAlias.id))
+    .leftJoin(artistAlias, eq(mangasTable.artistId, artistAlias.id));
+  return mangas;
+};
+
+export const getMangaById = async (db: DrizzleD1Database, mangaId: number) => {
+  const mangas = await db
+    .select({
+      id: mangasTable.id,
+      title: mangasTable.title,
+      description: mangasTable.description,
+      author: authorAlias.name,
+      artist: artistAlias.name,
+      status: mangasTable.status,
+    })
+    .from(mangasTable)
+    .leftJoin(authorAlias, eq(mangasTable.authorId, authorAlias.id))
+    .leftJoin(artistAlias, eq(mangasTable.artistId, artistAlias.id))
+    .where(eq(mangasTable.id, mangaId))
+    .get();
+  return mangas;
+};
 
 export const getMangaLibraryCounts = async (db: DrizzleD1Database) => {
   const data = await db
@@ -49,6 +89,20 @@ export const getMangaVolumeById = async (
   return data[0];
 };
 
+export const getMangaChapters = async (db: DrizzleD1Database) => {
+  const data = await db
+    .select({
+      volumeId: chaptersTable.volumeId,
+      title: chaptersTable.title,
+      number: chaptersTable.number,
+      pageCount: chaptersTable.pageCount,
+      releaseDate: chaptersTable.releaseDate,
+    })
+    .from(chaptersTable)
+    .orderBy(asc(chaptersTable.number));
+  return data;
+};
+
 export const getMangaChaptersByVolumeId = async (
   db: DrizzleD1Database,
   volumeId: number,
@@ -71,6 +125,7 @@ export const getMangaChapterById = async (
 ) => {
   const data = await db
     .select({
+      volumeId: chaptersTable.volumeId,
       title: chaptersTable.title,
       number: chaptersTable.number,
       pageCount: chaptersTable.pageCount,

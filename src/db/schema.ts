@@ -1,11 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  integer,
-  sqliteTable,
-  text,
-  unique,
-  alias,
-} from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 
 export const authorsTable = sqliteTable("authors", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -14,9 +8,6 @@ export const authorsTable = sqliteTable("authors", {
     .notNull()
     .default(sql`(unixepoch())`),
 });
-
-export const authorAlias = alias(authorsTable, "author");
-export const artistAlias = alias(authorsTable, "artist");
 
 export const mangasTable = sqliteTable(
   "mangas",

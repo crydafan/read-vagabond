@@ -118,19 +118,18 @@ Generated SQL script containing legacy seed data already parsed for the new data
 
 ## How to Apply the Migration
 
-### Step 1: Apply Schema Migration
+### Step 1: Apply Schema and Seed Migration
 
 ```bash
 pnpm wrangler d1 execute bagabondo-db --file=./drizzle/migrations/0000_complex_mimic.sql
-```
-
-### Step 2: Apply Seed Data
-
-```bash
+pnpm wrangler d1 execute bagabondo-db --file=./drizzle/migrations/0001_conscious_mongu.sql
 pnpm wrangler d1 execute bagabondo-db --file=./seeds/0000_seed_from_legacy.sql
+pnpm wrangler d1 execute bagabondo-db --file=./drizzle/migrations/0002_aspiring_thena.sql
+pnpm wrangler d1 execute bagabondo-db --file=./seeds/0001_update_manga_id_in_chapters.sql
+pnpm wrangler d1 execute bagabondo-db --file=./drizzle/migrations/0003_conscious_marvel_apes.sql
 ```
 
-### Step 3: Verify Migration
+### Step 2: Verify Migration
 
 ```bash
 # Check record counts
@@ -158,8 +157,9 @@ To add new chapters after this migration:
 
 ```sql
 -- Example: Adding chapter 323
-INSERT INTO chapters (volume_id, title, number, page_count, release_date)
+INSERT INTO chapters (manga_id, volume_id, title, number, page_count, release_date)
 VALUES (
+  1, -- Vagabond manga id
   (SELECT id FROM volumes WHERE number = 38),  -- Create volume 38 first if needed
   'Chapter Title',
   323,

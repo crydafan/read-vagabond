@@ -15,6 +15,13 @@
       "when": 1770217067396,
       "tag": "0001_conscious_mongu",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1770661794039,
+      "tag": "0002_aspiring_thena",
+      "breakpoints": true
     }
   ]
 }

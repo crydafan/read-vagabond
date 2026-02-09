@@ -95,6 +95,8 @@ export const getMangaVolumeById = async (
 export const getMangaChapters = async (db: DrizzleD1Database) => {
   const data = await db
     .select({
+      id: chaptersTable.id,
+      mangaId: chaptersTable.mangaId,
       volumeId: chaptersTable.volumeId,
       title: chaptersTable.title,
       number: chaptersTable.number,
@@ -128,6 +130,8 @@ export const getMangaChapterById = async (
 ) => {
   const data = await db
     .select({
+      id: chaptersTable.id,
+      mangaId: chaptersTable.mangaId,
       volumeId: chaptersTable.volumeId,
       title: chaptersTable.title,
       number: chaptersTable.number,

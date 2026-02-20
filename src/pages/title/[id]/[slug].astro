@@ -1,0 +1,195 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+import ChapterList from "../../../components/ChapterList.astro";
+
+const { id, slug } = Astro.params;
+
+const metadata = {
+  title: "Vagabond | Manga Details",
+  description:
+    "Read Vagabond manga online. Explore title information, creator credits, and start reading chapters.",
+  keywords: ["vagabond", "manga", "takehiko inoue", "seinen", "samurai"],
+  endpoint: `/title/${id}/${slug}`,
+};
+
+const mockVolumes = [
+  {
+    number: 1,
+    chapterRange: "Ch. 1-4",
+    chapters: [
+      {
+        number: 1,
+        title: "The Invincible Under the Sun",
+        releaseDate: new Date("1998-09-03"),
+      },
+      {
+        number: 2,
+        title: "The Path of the Sword",
+        releaseDate: new Date("1998-09-10"),
+      },
+      { number: 3, title: "Two Heavens", releaseDate: new Date("1998-09-17") },
+      {
+        number: 4,
+        title: "Echoes in the Field",
+        releaseDate: new Date("1998-09-24"),
+      },
+    ],
+  },
+  {
+    number: 2,
+    chapterRange: "Ch. 5-8",
+    chapters: [
+      {
+        number: 5,
+        title: "Yoshioka School",
+        releaseDate: new Date("1998-10-01"),
+      },
+      {
+        number: 6,
+        title: "Crossing Blades",
+        releaseDate: new Date("1998-10-08"),
+      },
+      {
+        number: 7,
+        title: "Quiet Resolve",
+        releaseDate: new Date("1998-10-15"),
+      },
+      { number: 8, title: "Moonlit Duel", releaseDate: new Date("1998-10-22") },
+    ],
+  },
+  {
+    number: 3,
+    chapterRange: "Ch. 9-12",
+    chapters: [
+      { number: 9, title: "Wanderer", releaseDate: new Date("1998-11-05") },
+      {
+        number: 10,
+        title: "The Riverbank",
+        releaseDate: new Date("1998-11-12"),
+      },
+      {
+        number: 11,
+        title: "Inner Silence",
+        releaseDate: new Date("1998-11-19"),
+      },
+      {
+        number: 12,
+        title: "A New Horizon",
+        releaseDate: new Date("1998-11-26"),
+      },
+    ],
+  },
+].reverse();
+---
+
+<MainLayout tagline="Vagabond" metadata={metadata}>
+  <main class="min-h-screen bg-white text-gray-900">
+    <div class="mt-23 w-full overflow-hidden">
+      <img
+        src="https://dw9to29mmj727.cloudfront.net/promo/2016/5574-Tier05_SeriesHeaders_Vagabond_2000x800_v2.jpg"
+        alt="Vagabond series header"
+        class="h-48 w-full object-cover object-center md:h-64 lg:h-80"
+        loading="eager"
+      />
+    </div>
+
+    <div class="border-b border-gray-200 bg-white">
+      <div class="mx-auto max-w-4xl px-4 py-8 md:px-6">
+        <h1
+          class="text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl"
+        >
+          Vagabond
+        </h1>
+
+        <div class="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+          <span class="flex items-center gap-1.5">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-gray-400"
+              >Artist</span
+            >
+            <span class="text-gray-800">Takehiko Inoue</span>
+          </span>
+          <span class="hidden text-gray-300 md:inline">·</span>
+          <span class="flex items-center gap-1.5">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-gray-400"
+              >Author</span
+            >
+            <span class="text-gray-800">Takehiko Inoue</span>
+          </span>
+          <span class="hidden text-gray-300 md:inline">·</span>
+          <span class="flex items-center gap-1.5">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-gray-400"
+              >Released</span
+            >
+            <span class="text-gray-800">September 3, 1998</span>
+          </span>
+        </div>
+
+        <p class="mt-5 text-sm leading-7 text-gray-700">
+          Striving for enlightenment by way of the sword, Miyamoto Musashi is
+          prepared to cut down anyone who stands in his way. Vagabond is an
+          action-packed portrayal of the life and times of the quintessential
+          warrior-philosopher—the most celebrated samurai of all time!
+        </p>
+
+        <section id="volumes" class="pt-6 pb-2 scroll-mt-20">
+          <h2 class="text-center mb-2 text-3xl font-bold text-gray-900">
+            Volumes
+          </h2>
+          <div class="flex justify-center gap-2 mb-4">
+            <span
+              class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded"
+              >{37} volumes</span
+            >
+            <span
+              class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded"
+              >{327} chapters</span
+            >
+          </div>
+        </section>
+      </div>
+
+      <div class="mx-auto max-w-4xl px-4 pb-16 md:px-6">
+        <div class="mx-auto max-w-3xl border-t border-gray-200">
+          {
+            mockVolumes.map((volume) => (
+              <details class="group border-b border-gray-200">
+                <summary class="flex cursor-pointer list-none items-center justify-between py-3">
+                  <div class="flex items-center gap-3">
+                    <svg
+                      class="h-4 w-4 shrink-0 text-gray-400 transition-transform group-open:rotate-90"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                    <span class="text-sm font-bold text-gray-900">
+                      Volume {volume.number}
+                    </span>
+                  </div>
+                  <span class="text-xs text-gray-500">
+                    {volume.chapterRange}
+                  </span>
+                </summary>
+                <div class="pb-2">
+                  <ChapterList
+                    volumeNumber={volume.number}
+                    chapters={volume.chapters}
+                  />
+                </div>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+</MainLayout>

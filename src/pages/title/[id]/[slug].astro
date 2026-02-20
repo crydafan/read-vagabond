@@ -1,8 +1,17 @@
 ---
 import MainLayout from "../../../layouts/MainLayout.astro";
 import ChapterList from "../../../components/ChapterList.astro";
+import { getDb } from "../../../db/client";
+import { getMangaVolumesWithChapters } from "../../../lib/db";
 
 const { id, slug } = Astro.params;
+
+const db = getDb(Astro.locals.runtime.env.bagabondo_db);
+if (!db) {
+  throw new Error("Database not configured");
+}
+
+const volumesWithChapters = await getMangaVolumesWithChapters(db);
 
 const metadata = {
   title: "Vagabond | Manga Details",
@@ -11,75 +20,6 @@ const metadata = {
   keywords: ["vagabond", "manga", "takehiko inoue", "seinen", "samurai"],
   endpoint: `/title/${id}/${slug}`,
 };
-
-const mockVolumes = [
-  {
-    number: 1,
-    chapterRange: "Ch. 1-4",
-    chapters: [
-      {
-        number: 1,
-        title: "The Invincible Under the Sun",
-        releaseDate: new Date("1998-09-03"),
-      },
-      {
-        number: 2,
-        title: "The Path of the Sword",
-        releaseDate: new Date("1998-09-10"),
-      },
-      { number: 3, title: "Two Heavens", releaseDate: new Date("1998-09-17") },
-      {
-        number: 4,
-        title: "Echoes in the Field",
-        releaseDate: new Date("1998-09-24"),
-      },
-    ],
-  },
-  {
-    number: 2,
-    chapterRange: "Ch. 5-8",
-    chapters: [
-      {
-        number: 5,
-        title: "Yoshioka School",
-        releaseDate: new Date("1998-10-01"),
-      },
-      {
-        number: 6,
-        title: "Crossing Blades",
-        releaseDate: new Date("1998-10-08"),
-      },
-      {
-        number: 7,
-        title: "Quiet Resolve",
-        releaseDate: new Date("1998-10-15"),
-      },
-      { number: 8, title: "Moonlit Duel", releaseDate: new Date("1998-10-22") },
-    ],
-  },
-  {
-    number: 3,
-    chapterRange: "Ch. 9-12",
-    chapters: [
-      { number: 9, title: "Wanderer", releaseDate: new Date("1998-11-05") },
-      {
-        number: 10,
-        title: "The Riverbank",
-        releaseDate: new Date("1998-11-12"),
-      },
-      {
-        number: 11,
-        title: "Inner Silence",
-        releaseDate: new Date("1998-11-19"),
-      },
-      {
-        number: 12,
-        title: "A New Horizon",
-        releaseDate: new Date("1998-11-26"),
-      },
-    ],
-  },
-].reverse();
 ---
 
 <MainLayout tagline="Vagabond" metadata={metadata}>
@@ -154,7 +94,7 @@ const mockVolumes = [
       <div class="mx-auto max-w-4xl px-4 pb-16 md:px-6">
         <div class="mx-auto max-w-3xl border-t border-gray-200">
           {
-            mockVolumes.map((volume) => (
+            volumesWithChapters.map((volume) => (
               <details class="group border-b border-gray-200">
                 <summary class="flex cursor-pointer list-none items-center justify-between py-3">
                   <div class="flex items-center gap-3">
@@ -176,7 +116,7 @@ const mockVolumes = [
                     </span>
                   </div>
                   <span class="text-xs text-gray-500">
-                    {volume.chapterRange}
+                    {volume.chapters.length} chapters
                   </span>
                 </summary>
                 <div class="pb-2">

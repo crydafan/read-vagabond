@@ -1,4 +1,4 @@
-import { sql, eq, asc, countDistinct, min, max } from "drizzle-orm";
+import { sql, eq, asc, countDistinct, min, max, desc } from "drizzle-orm";
 import { chaptersTable, volumesTable } from "../db/schema";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 
@@ -66,6 +66,35 @@ export const getMangaVolumeByNumber = async (
     .where(eq(volumesTable.number, volumeNumber))
     .groupBy(volumesTable.id, volumesTable.number);
   return data[0];
+};
+
+// TODO(crydafan): This is hacky. Find a better way to get volumes with chapters.
+export const getMangaVolumesWithChapters = async (db: DrizzleD1Database) => {
+  const data = await db
+    .select({
+      volumeId: volumesTable.id,
+      number: volumesTable.number,
+      chapters: sql<string>`JSON_GROUP_ARRAY(
+        JSON_OBJECT(
+          'number', ${chaptersTable.number},
+          'title', ${chaptersTable.title},
+          'releaseDate', ${chaptersTable.releaseDate}
+        )
+      )`.as("chapters"),
+    })
+    .from(volumesTable)
+    .innerJoin(chaptersTable, eq(chaptersTable.volumeId, volumesTable.id))
+    .groupBy(volumesTable.id, volumesTable.number)
+    .orderBy(desc(volumesTable.number));
+  return data.map((item) => ({
+    ...item,
+    chapters: JSON.parse(item.chapters)
+      .reverse()
+      .map((chapter: any) => ({
+        ...chapter,
+        releaseDate: new Date(chapter.releaseDate * 1000), // Convert from seconds to milliseconds
+      })),
+  }));
 };
 
 export const getMangaChaptersByVolumeId = async (

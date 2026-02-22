@@ -43,6 +43,13 @@
       "when": 1771090794233,
       "tag": "0005_wealthy_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1771720209329,
+      "tag": "0006_equal_dazzler",
+      "breakpoints": true
     }
   ]
 }

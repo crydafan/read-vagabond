@@ -26,10 +26,16 @@ export const mangasTable = sqliteTable(
       .$defaultFn(() => uuidv4()),
     authorId: text("author_id")
       .notNull()
-      .references(() => authorsTable.id),
+      .references(() => authorsTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     artistId: text("artist_id")
       .notNull()
-      .references(() => authorsTable.id),
+      .references(() => authorsTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     title: text("title").notNull(),
     description: text("description"),
     status: text("status").notNull(),
@@ -48,7 +54,10 @@ export const volumesTable = sqliteTable(
       .$defaultFn(() => uuidv4()),
     mangaId: text("manga_id")
       .notNull()
-      .references(() => mangasTable.id),
+      .references(() => mangasTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     number: integer("number").notNull(),
     releaseDate: integer("release_date", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" })
@@ -69,10 +78,16 @@ export const chaptersTable = sqliteTable(
       .$defaultFn(() => uuidv4()),
     mangaId: text("manga_id")
       .notNull()
-      .references(() => mangasTable.id),
+      .references(() => mangasTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     volumeId: text("volume_id")
       .notNull()
-      .references(() => volumesTable.id),
+      .references(() => volumesTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     title: text("title").notNull(),
     number: integer("number").notNull(),
     pageCount: integer("page_count").notNull(),

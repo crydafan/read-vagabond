@@ -15,7 +15,8 @@
     "drizzle-orm": "^0.45.1",
     "flowbite": "^4.0.1",
     "nanostores": "^1.1.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.8",

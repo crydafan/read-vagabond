@@ -34,7 +34,7 @@ export function getComicSeriesSchema() {
     genre: ["Action", "Drama", "Historical", "Martial Arts", "Seinen"],
     description:
       "Vagabond is a critically acclaimed, epic historical manga by Takehiko Inoue, based on Eiji Yoshikawa's novel Musashi. It tells the fictionalized life story of legendary swordsman Musashi Miyamoto as he transforms from a wild, violent young man into a disciplined, philosophical warrior seeking the meaning of strength and enlightenment",
-    image: "https://readbagabondo.com/Musashi_Eating.jpg",
+    image: "https://readbagabondo.com/Musashi_Eating.webp",
   };
 }
 

@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1771721278207,
+      "tag": "0000_spotty_lifeguard",
+      "breakpoints": true
+    }
+  ]
+}

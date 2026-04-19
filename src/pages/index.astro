@@ -31,7 +31,7 @@ const volumes = await getMangaVolumes(db);
 >
   <main class="max-w-275 mx-auto px-4 md:px-6 pt-20">
     <section
-      class="pt-12 pb-8 md:pt-24 md:pb-16 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 md:gap-10 items-center"
+      class="pt-12 pb-8 md:pt-24 md:pb-16 md:min-h-[calc(95vh-5rem)] grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 md:gap-10 items-center"
     >
       <div>
         <h1 class="text-4xl md:text-6xl leading-[1.05] m-0 mb-4 font-bold">
@@ -75,7 +75,12 @@ const volumes = await getMangaVolumes(db);
       <img
         src="/Musashi_Eating.webp"
         alt="Musashi Eating"
-        class="w-full md:max-w-100 lg:max-w-full mx-auto"
+        class="block dark:hidden w-full md:max-w-100 lg:max-w-full mx-auto"
+      />
+      <img
+        src="/Musashi_Pray.webp"
+        alt="Musashi Praying"
+        class="hidden dark:block w-full md:max-w-100 lg:max-w-full mx-auto"
       />
     </section>
 

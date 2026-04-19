@@ -37,7 +37,7 @@ const volumes = await getMangaVolumes(db);
         <h1 class="text-4xl md:text-6xl leading-[1.05] m-0 mb-4 font-bold">
           Read Takehiko Inoue's masterpiece like never before
         </h1>
-        <p class="text-gray-500 text-lg max-w-[52ch]">
+        <p class="text-gray-500 dark:text-neutral-400 text-lg max-w-[52ch]">
           High-quality scans. Free and ad-free. Forever.
         </p>
         <div class="flex items-center gap-3 mt-3">
@@ -60,13 +60,13 @@ const volumes = await getMangaVolumes(db);
         >
           <a
             href="#volumes"
-            class="text-white bg-gray-900 hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-base px-6 py-3 text-center w-full md:w-auto focus:outline-none"
+            class="text-white dark:text-black bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-neutral-200 focus:ring-4 focus:ring-gray-300 dark:focus:ring-neutral-700 font-medium rounded-lg text-base px-6 py-3 text-center w-full md:w-auto focus:outline-none"
           >
             ↓ Start Reading
           </a>
           <a
             href="#donate"
-            class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-base px-6 py-3 text-center w-full md:w-auto focus:outline-none"
+            class="text-gray-900 dark:text-white bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-900 focus:ring-4 focus:ring-gray-100 dark:focus:ring-neutral-800 font-medium rounded-lg text-base px-6 py-3 text-center w-full md:w-auto focus:outline-none"
           >
             Donate
           </a>
@@ -80,14 +80,18 @@ const volumes = await getMangaVolumes(db);
     </section>
 
     <section id="volumes" class="py-10 md:py-16 scroll-mt-20">
-      <h2 class="text-center mb-4 text-3xl font-bold text-gray-900">Volumes</h2>
+      <h2
+        class="text-center mb-4 text-3xl font-bold text-gray-900 dark:text-white"
+      >
+        Volumes
+      </h2>
       <div class="flex justify-center gap-2 mb-8">
         <span
-          class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded"
+          class="bg-gray-100 dark:bg-neutral-900 text-gray-800 dark:text-neutral-200 text-sm font-medium px-3 py-1 rounded"
           >{volumeCount} volumes</span
         >
         <span
-          class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded"
+          class="bg-gray-100 dark:bg-neutral-900 text-gray-800 dark:text-neutral-200 text-sm font-medium px-3 py-1 rounded"
           >{chapterCount} chapters</span
         >
       </div>
@@ -109,13 +113,15 @@ const volumes = await getMangaVolumes(db);
     </section>
 
     <section id="donate" class="py-10 md:py-16">
-      <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow">
+      <div
+        class="block p-6 bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg shadow"
+      >
         <h5
-          class="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900"
+          class="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
         >
           Support This Project
         </h5>
-        <p class="mb-4 text-gray-700">
+        <p class="mb-4 text-gray-700 dark:text-neutral-300">
           If you enjoy this reader and want to support its development, consider
           buying me a coffee! Your donations help keep this project
           high-quality, free and ad-free for everyone.
@@ -125,7 +131,7 @@ const volumes = await getMangaVolumes(db);
             href="https://www.paypal.com/paypalme/mdnssknght"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center justify-center gap-2 text-white bg-gray-900 hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full md:w-auto focus:outline-none"
+            class="inline-flex items-center justify-center gap-2 text-white dark:text-black bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-neutral-200 focus:ring-4 focus:ring-gray-300 dark:focus:ring-neutral-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full md:w-auto focus:outline-none"
           >
             Donate via PayPal
             <i class="fab fa-paypal"></i>
@@ -134,7 +140,7 @@ const volumes = await getMangaVolumes(db);
             href="https://buymeacoffee.com/crydafan"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center justify-center gap-2 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full md:w-auto focus:outline-none"
+            class="inline-flex items-center justify-center gap-2 text-gray-900 dark:text-white bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-900 focus:ring-4 focus:ring-gray-100 dark:focus:ring-neutral-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full md:w-auto focus:outline-none"
           >
             Buy Me a Coffee
             <i class="fa fa-coffee"></i>

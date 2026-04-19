@@ -13,23 +13,25 @@ const { volumeNumber, chapters } = Astro.props;
 
 <div class="flex flex-col">
   <div class="flex-1 overflow-y-auto">
-    <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-      <div class="divide-y divide-gray-200">
+    <div
+      class="bg-gray-50 dark:bg-neutral-950 rounded-lg border border-gray-200 dark:border-neutral-800 overflow-hidden"
+    >
+      <div class="divide-y divide-gray-200 dark:divide-neutral-800">
         {
           chapters.map((chapter) => (
             <a
               href={`/volume-${volumeNumber}/chapter-${chapter.number}`}
-              class="flex items-center justify-between p-3 hover:bg-white transition-colors duration-150 group"
+              class="flex items-center justify-between p-3 hover:bg-white dark:hover:bg-neutral-900 transition-colors duration-150 group"
             >
               <div class="flex-1 min-w-0 pr-4">
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-medium text-gray-700">
+                  <span class="text-xs font-medium text-gray-700 dark:text-neutral-300">
                     Ch. {chapter.number}
                   </span>
                   {chapter.releaseDate !== null && (
                     <>
-                      <span class="text-gray-400">•</span>
-                      <span class="text-xs text-gray-500">
+                      <span class="text-gray-400 dark:text-neutral-500">•</span>
+                      <span class="text-xs text-gray-500 dark:text-neutral-400">
                         {chapter.releaseDate.toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -38,13 +40,13 @@ const { volumeNumber, chapters } = Astro.props;
                     </>
                   )}
                 </div>
-                <h3 class="text-sm font-semibold text-gray-900 group-hover:text-gray-700 transition-colors truncate">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-neutral-300 transition-colors truncate">
                   {chapter.title || "Untitled Chapter"}
                 </h3>
               </div>
               <div class="flex items-center">
                 <svg
-                  class="w-5 h-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all shrink-0"
+                  class="w-5 h-5 text-gray-400 dark:text-neutral-500 group-hover:text-gray-600 dark:group-hover:text-neutral-300 group-hover:translate-x-1 transition-all shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

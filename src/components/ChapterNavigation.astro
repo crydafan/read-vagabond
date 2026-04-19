@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import ArrowIcon from "./ArrowIcon.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 
 export interface Props {
   volume: number;
@@ -17,7 +18,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
 ---
 
 <nav
-  class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200/50 z-50 transition-transform duration-300"
+  class="fixed top-0 left-0 right-0 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-gray-200/50 dark:border-neutral-800/50 z-50 transition-transform duration-300"
   id="navBar"
 >
   <div
@@ -25,16 +26,18 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
   >
     <div class="flex items-center gap-3 md:gap-4">
       <a href="/">
-        <img src="/Vagabond_Logo.png" alt="Vagabond" class="h-15" />
+        <img src="/Vagabond_Logo.png" alt="Vagabond" class="h-15 dark:invert" />
       </a>
 
       <div class="flex flex-col gap-0.5">
         <span
-          class="bg-gray-100 text-gray-800 text-2xs md:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide"
+          class="bg-gray-100 dark:bg-neutral-900 text-gray-800 dark:text-neutral-200 text-2xs md:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide"
         >
           Ch. {chapter.number}
         </span>
-        <span class="text-xs md:text-sm font-semibold text-gray-900">
+        <span
+          class="text-xs md:text-sm font-semibold text-gray-900 dark:text-white"
+        >
           {chapter.title}
         </span>
       </div>
@@ -42,7 +45,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
 
     <div class="flex items-center gap-2 md:gap-3">
       <span
-        class="text-gray-500 text-[11px] md:text-sm font-medium whitespace-nowrap uppercase"
+        class="text-gray-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium whitespace-nowrap uppercase"
       >
         Pg. <span id="pageCounter">1</span> / {chapter.pageCount}
       </span>
@@ -50,7 +53,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
         prevChapter !== null ? (
           <a
             href={`/volume-${volume}/chapter-${prevChapter}`}
-            class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 focus:outline-none transition-colors whitespace-nowrap"
+            class="text-gray-900 dark:text-white bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-900 focus:ring-4 focus:ring-gray-100 dark:focus:ring-neutral-800 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 focus:outline-none transition-colors whitespace-nowrap"
           >
             <span class="inline-flex items-center gap-1">
               <ArrowIcon direction="left" class="w-3 h-3" />
@@ -59,7 +62,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
           </a>
         ) : (
           <button
-            class="text-gray-400 bg-gray-100 border border-gray-200 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 cursor-not-allowed whitespace-nowrap"
+            class="text-gray-400 dark:text-neutral-600 bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 cursor-not-allowed whitespace-nowrap"
             disabled
           >
             <span class="inline-flex items-center gap-1">
@@ -73,7 +76,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
         nextChapter !== null ? (
           <a
             href={`/volume-${volume}/chapter-${nextChapter}`}
-            class="text-white bg-gray-900 hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 focus:outline-none transition-colors whitespace-nowrap"
+            class="text-white dark:text-black bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-neutral-200 focus:ring-4 focus:ring-gray-300 dark:focus:ring-neutral-700 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 focus:outline-none transition-colors whitespace-nowrap"
           >
             <span class="inline-flex items-center gap-1">
               Next
@@ -82,7 +85,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
           </a>
         ) : (
           <button
-            class="text-gray-400 bg-gray-100 border border-gray-200 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 cursor-not-allowed whitespace-nowrap"
+            class="text-gray-400 dark:text-neutral-600 bg-gray-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 cursor-not-allowed whitespace-nowrap"
             disabled
           >
             <span class="inline-flex items-center gap-1">
@@ -92,6 +95,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
           </button>
         )
       }
+      <ThemeToggle />
     </div>
   </div>
 </nav>

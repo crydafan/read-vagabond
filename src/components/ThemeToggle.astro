@@ -1,0 +1,39 @@
+---
+
+---
+
+<button
+  type="button"
+  id="themeToggle"
+  aria-label="Toggle dark mode"
+  class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-black hover:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-neutral-700 transition-colors"
+>
+  <i id="themeIcon" class="fas fa-moon inline text-3xl"></i>
+</button>
+
+<script>
+  const button = document.getElementById("themeToggle");
+  const icon = document.getElementById("themeIcon");
+
+  if (button && icon) {
+    const isDark = document.documentElement.classList.contains("dark");
+    icon.className = isDark
+      ? "fas fa-sun inline text-3xl"
+      : "fas fa-moon inline text-3xl";
+
+    button.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+
+      icon.className = isDark
+        ? "fas fa-sun inline text-3xl"
+        : "fas fa-moon inline text-3xl";
+
+      try {
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      } catch (e) {}
+
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", isDark ? "#000000" : "#ffffff");
+    });
+  }
+</script>

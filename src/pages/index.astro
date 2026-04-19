@@ -73,14 +73,11 @@ const volumes = await getMangaVolumes(db);
         </div>
       </div>
       <img
+        id="hero"
         src="/Musashi_Eating.webp"
         alt="Musashi Eating"
-        class="block dark:hidden w-full md:max-w-100 lg:max-w-full mx-auto"
-      />
-      <img
-        src="/Musashi_Pray.webp"
-        alt="Musashi Praying"
-        class="hidden dark:block w-full md:max-w-100 lg:max-w-full mx-auto"
+        class="w-full md:max-w-100 lg:max-w-full mx-auto"
+        fetchpriority="high"
       />
     </section>
 
@@ -157,6 +154,23 @@ const volumes = await getMangaVolumes(db);
 </MainLayout>
 
 <script>
+  const hero = document.getElementById("hero") as HTMLImageElement | null;
+
+  const syncHero = () => {
+    if (!hero) return;
+
+    const isDark = document.documentElement.classList.contains("dark");
+    hero.src = isDark ? "/Musashi_Pray.webp" : "/Musashi_Eating.webp";
+    hero.alt = isDark ? "Musashi Praying" : "Musashi Eating";
+  };
+
+  syncHero();
+
+  new MutationObserver(syncHero).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+
   document.addEventListener("click", (e) => {
     const target = e.target;
     if (!(target instanceof Element)) return;

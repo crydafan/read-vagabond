@@ -35,13 +35,29 @@ const title = tagline
       referrerpolicy="no-referrer"
     />
     <MetadataTags {...Astro.props} />
+    <script>
+      try {
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+
+        const isDark = stored ? stored === "dark" : prefersDark;
+        if (isDark) document.documentElement.classList.add("dark");
+
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", isDark ? "#000000" : "#ffffff");
+      } catch (e) {}
+    </script>
     <slot name="head" />
     <script
       is:inline
       src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"
     ></script>
   </head>
-  <body class="m-0 p-0 overflow-x-hidden bg-white text-gray-900 font-sans">
+  <body
+    class="m-0 p-0 overflow-x-hidden bg-white text-gray-900 dark:bg-black dark:text-white font-sans"
+  >
     <slot />
   </body>
 </html>

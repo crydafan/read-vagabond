@@ -6,14 +6,16 @@ export interface Props {
 const { pagesUrl } = Astro.props;
 ---
 
-<div class="min-h-screen bg-white flex flex-col items-center pt-20 md:pt-24">
+<div
+  class="min-h-screen bg-white dark:bg-black flex flex-col items-center pt-20 md:pt-24"
+>
   <div class="w-full max-w-350 flex flex-col items-center">
     {
       pagesUrl.map((pageUrl, index) => (
         <img
           src={pageUrl}
           alt={`Page ${index + 1}`}
-          class="h-auto max-h-screen block mb-0.5 object-contain border border-gray-900"
+          class="h-auto max-h-screen block mb-0.5 object-contain border border-gray-900 dark:border-neutral-700"
           loading={index < 3 ? "eager" : "lazy"}
           data-page={index}
         />

@@ -31,7 +31,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
 
       <div class="flex flex-col gap-0.5">
         <span
-          class="bg-gray-100 dark:bg-neutral-900 text-gray-800 dark:text-neutral-200 text-2xs md:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide"
+          class="bg-gray-100 dark:bg-neutral-900 text-gray-800 dark:text-neutral-200 text-2xs md:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wide w-fit"
         >
           Ch. {chapter.number}
         </span>
@@ -76,7 +76,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
         nextChapter !== null ? (
           <a
             href={`/volume-${volume}/chapter-${nextChapter}`}
-            class="text-white dark:text-black bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-neutral-200 focus:ring-4 focus:ring-gray-300 dark:focus:ring-neutral-700 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 focus:outline-none transition-colors whitespace-nowrap"
+            class="text-white dark:text-black bg-black dark:bg-white hover:bg-neutral-900 dark:hover:bg-neutral-200 focus:ring-4 focus:ring-gray-300 dark:focus:ring-neutral-700 font-medium rounded-lg text-[11px] md:text-sm px-3 py-1.5 md:px-4 md:py-2 focus:outline-none transition-colors whitespace-nowrap"
           >
             <span class="inline-flex items-center gap-1">
               Next

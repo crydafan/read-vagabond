@@ -1,0 +1,200 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+import ChapterList from "../../../components/ChapterList.astro";
+import { getDb } from "../../../db/client";
+import { getMangaVolumesWithChapters } from "../../../lib/db";
+
+const { id, slug } = Astro.params;
+
+const db = getDb(Astro.locals.runtime.env.bagabondo_db);
+if (!db) {
+  throw new Error("Database not configured");
+}
+
+const volumesWithChapters = await getMangaVolumesWithChapters(db);
+
+const metadata = {
+  title: "Vagabond | Manga Details",
+  description:
+    "Read Vagabond manga online. Explore title information, creator credits, and start reading chapters.",
+  keywords: ["vagabond", "manga", "takehiko inoue", "seinen", "samurai"],
+  endpoint: `/title/${id}/${slug}`,
+};
+---
+
+<MainLayout tagline="Vagabond" metadata={metadata}>
+  <main class="min-h-screen bg-white text-gray-900">
+    <div class="mt-23 w-full overflow-hidden">
+      <img
+        src="https://dw9to29mmj727.cloudfront.net/promo/2016/5574-Tier05_SeriesHeaders_Vagabond_2000x800_v2.jpg"
+        alt="Vagabond series header"
+        class="h-48 w-full object-cover object-center md:h-64 lg:h-80"
+        loading="eager"
+      />
+    </div>
+
+    <div class="border-b border-gray-200 bg-white">
+      <div class="mx-auto max-w-4xl px-4 py-8 md:px-6">
+        <h1
+          class="text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl"
+        >
+          Vagabond
+        </h1>
+
+        <div class="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+          <span class="flex items-center gap-1.5">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-gray-400"
+              >Artist</span
+            >
+            <span class="text-gray-800">Takehiko Inoue</span>
+          </span>
+          <span class="hidden text-gray-300 md:inline">·</span>
+          <span class="flex items-center gap-1.5">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-gray-400"
+              >Author</span
+            >
+            <span class="text-gray-800">Takehiko Inoue</span>
+          </span>
+          <span class="hidden text-gray-300 md:inline">·</span>
+          <span class="flex items-center gap-1.5">
+            <span
+              class="text-xs font-bold uppercase tracking-widest text-gray-400"
+              >Released</span
+            >
+            <span class="text-gray-800">September 3, 1998</span>
+          </span>
+        </div>
+
+        <p class="mt-5 text-sm leading-7 text-gray-700">
+          Striving for enlightenment by way of the sword, Miyamoto Musashi is
+          prepared to cut down anyone who stands in his way. Vagabond is an
+          action-packed portrayal of the life and times of the quintessential
+          warrior-philosopher—the most celebrated samurai of all time!
+        </p>
+
+        <section id="volumes" class="pt-6 pb-2 scroll-mt-20">
+          <h2 class="text-center mb-2 text-3xl font-bold text-gray-900">
+            Volumes
+          </h2>
+          <div class="flex justify-center gap-2 mb-4">
+            <span
+              class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded"
+              >{37} volumes</span
+            >
+            <span
+              class="bg-gray-100 text-gray-800 text-sm font-medium px-3 py-1 rounded"
+              >{327} chapters</span
+            >
+          </div>
+        </section>
+      </div>
+
+      <div class="mx-auto max-w-4xl px-4 pb-16 md:px-6">
+        <div id="title-volumes-list" class="mx-auto max-w-3xl border-gray-200">
+          {
+            volumesWithChapters.map((volume, i) => (
+              <div
+                class="title-volume-item"
+                data-volume-index={i}
+                style={i >= 3 ? "display:none" : ""}
+              >
+                <details open class="group border-gray-200">
+                  <summary class="flex cursor-pointer list-none items-center justify-between py-3">
+                    <div class="flex items-center gap-3">
+                      <svg
+                        class="h-4 w-4 shrink-0 text-gray-400 transition-transform group-open:rotate-90"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                      <span class="text-sm font-bold text-gray-900">
+                        Volume {volume.number}
+                      </span>
+                    </div>
+                    <span class="text-xs text-gray-500">
+                      {volume.chapters.length} chapters
+                    </span>
+                  </summary>
+                  <div class="pb-2">
+                    <ChapterList
+                      volumeNumber={volume.number}
+                      chapters={volume.chapters}
+                    />
+                  </div>
+                </details>
+              </div>
+            ))
+          }
+        </div>
+
+        <div
+          class="flex items-center justify-center gap-3 mt-8 mx-auto max-w-3xl"
+          id="title-volumes-pagination"
+        >
+          <button
+            id="title-volumes-prev"
+            disabled
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            ← Previous
+          </button>
+          <span id="title-volumes-page-info" class="text-sm text-gray-500">
+            Page 1 of {Math.ceil(volumesWithChapters.length / 3)}
+          </span>
+          <button
+            id="title-volumes-next"
+            disabled={volumesWithChapters.length <= 3}
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Next →
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</MainLayout>
+
+<script>
+  const PER_PAGE = 3;
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>(".title-volume-item"),
+  );
+  const totalPages = Math.ceil(items.length / PER_PAGE);
+  let currentPage = 0;
+
+  const prevBtn = document.getElementById(
+    "title-volumes-prev",
+  ) as HTMLButtonElement | null;
+  const nextBtn = document.getElementById(
+    "title-volumes-next",
+  ) as HTMLButtonElement | null;
+  const pageInfo = document.getElementById("title-volumes-page-info");
+
+  function showPage(page: number) {
+    items.forEach((item, i) => {
+      item.style.display =
+        i >= page * PER_PAGE && i < (page + 1) * PER_PAGE ? "" : "none";
+    });
+    if (pageInfo) pageInfo.textContent = `Page ${page + 1} of ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = page === 0;
+    if (nextBtn) nextBtn.disabled = page >= totalPages - 1;
+    currentPage = page;
+  }
+
+  prevBtn?.addEventListener("click", () => {
+    if (currentPage > 0) showPage(currentPage - 1);
+  });
+
+  nextBtn?.addEventListener("click", () => {
+    if (currentPage < totalPages - 1) showPage(currentPage + 1);
+  });
+</script>

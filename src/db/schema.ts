@@ -6,9 +6,12 @@ import {
   text,
   unique,
 } from "drizzle-orm/sqlite-core";
+import { v4 as uuidv4 } from "uuid";
 
 export const authorsTable = sqliteTable("authors", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => uuidv4()),
   name: text("name").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
@@ -18,13 +21,22 @@ export const authorsTable = sqliteTable("authors", {
 export const mangasTable = sqliteTable(
   "mangas",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-    authorId: integer("author_id")
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv4()),
+    authorId: text("author_id")
       .notNull()
-      .references(() => authorsTable.id),
-    artistId: integer("artist_id")
+      .references(() => authorsTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    artistId: text("artist_id")
       .notNull()
-      .references(() => authorsTable.id),
+      .references(() => authorsTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    slug: text("slug").notNull(),
     title: text("title").notNull(),
     description: text("description"),
     status: text("status").notNull(),
@@ -38,10 +50,15 @@ export const mangasTable = sqliteTable(
 export const volumesTable = sqliteTable(
   "volumes",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-    mangaId: integer("manga_id")
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv4()),
+    mangaId: text("manga_id")
       .notNull()
-      .references(() => mangasTable.id),
+      .references(() => mangasTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     number: integer("number").notNull(),
     releaseDate: integer("release_date", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" })
@@ -57,13 +74,22 @@ export const volumesTable = sqliteTable(
 export const chaptersTable = sqliteTable(
   "chapters",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-    mangaId: integer("manga_id")
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv4()),
+    mangaId: text("manga_id")
       .notNull()
-      .references(() => mangasTable.id),
-    volumeId: integer("volume_id")
+      .references(() => mangasTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    volumeId: text("volume_id")
       .notNull()
-      .references(() => volumesTable.id),
+      .references(() => volumesTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    slug: text("slug").notNull(),
     title: text("title").notNull(),
     number: integer("number").notNull(),
     pageCount: integer("page_count").notNull(),

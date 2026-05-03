@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "87a917a1-89cd-48d0-a19e-733dc395bd6b",
+  "id": "7cd350d9-88d4-4e59-a843-868de0d92e3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "authors": {
@@ -9,10 +9,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "name": {
           "name": "name",
@@ -41,14 +41,28 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
+        },
+        "manga_id": {
+          "name": "manga_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "volume_id": {
           "name": "volume_id",
-          "type": "integer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -90,8 +104,37 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "chapters_number_idx": {
+          "name": "chapters_number_idx",
+          "columns": [
+            "number"
+          ],
+          "isUnique": false
+        },
+        "chapters_volume_id_number_unique": {
+          "name": "chapters_volume_id_number_unique",
+          "columns": [
+            "volume_id",
+            "number"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
+        "chapters_manga_id_mangas_id_fk": {
+          "name": "chapters_manga_id_mangas_id_fk",
+          "tableFrom": "chapters",
+          "tableTo": "mangas",
+          "columnsFrom": [
+            "manga_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
         "chapters_volume_id_volumes_id_fk": {
           "name": "chapters_volume_id_volumes_id_fk",
           "tableFrom": "chapters",
@@ -102,8 +145,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -115,21 +158,28 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "author_id": {
           "name": "author_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "artist_id": {
           "name": "artist_id",
-          "type": "integer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -164,7 +214,16 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "mangas_author_id_title_unique": {
+          "name": "mangas_author_id_title_unique",
+          "columns": [
+            "author_id",
+            "title"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "mangas_author_id_authors_id_fk": {
           "name": "mangas_author_id_authors_id_fk",
@@ -176,8 +235,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         },
         "mangas_artist_id_authors_id_fk": {
           "name": "mangas_artist_id_authors_id_fk",
@@ -189,8 +248,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -202,14 +261,14 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "manga_id": {
           "name": "manga_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -237,7 +296,23 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "volumes_number_idx": {
+          "name": "volumes_number_idx",
+          "columns": [
+            "number"
+          ],
+          "isUnique": false
+        },
+        "volumes_manga_id_number_unique": {
+          "name": "volumes_manga_id_number_unique",
+          "columns": [
+            "manga_id",
+            "number"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "volumes_manga_id_mangas_id_fk": {
           "name": "volumes_manga_id_mangas_id_fk",
@@ -249,8 +324,8 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},

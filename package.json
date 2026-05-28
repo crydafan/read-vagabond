@@ -9,9 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^10.1.1",
     "@libsql/client": "^0.17.3",
     "@tailwindcss/vite": "^4.1.18",
-    "astro": "^5.16.11",
+    "astro": "^6.3.8",
     "drizzle-orm": "^0.45.1",
     "flowbite": "^4.0.1",
     "nanostores": "^1.1.0",

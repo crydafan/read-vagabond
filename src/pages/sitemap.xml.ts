@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { getDb } from "../db/client";
 import { getMangaVolumes } from "../lib/db";
 
 interface SitemapUrl {
@@ -9,14 +8,9 @@ interface SitemapUrl {
   priority: string;
 }
 
-export const GET: APIRoute = async ({ locals }) => {
-  const db = getDb(locals.runtime.env.bagabondo_db);
-  if (!db) {
-    return new Response("Database not configured", { status: 500 });
-  }
-
+export const GET: APIRoute = async () => {
   const siteUrl = "https://readbagabondo.com";
-  const volumes = await getMangaVolumes(db);
+  const volumes = await getMangaVolumes();
 
   const urls: SitemapUrl[] = [];
 

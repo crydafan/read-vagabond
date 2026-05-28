@@ -1,6 +1,5 @@
 ---
 import ChapterLayout from "../../../layouts/ChapterLayout.astro";
-import { getDb } from "../../../db/client";
 import {
   getMangaVolumeByNumber,
   getMangaChapterByNumber,
@@ -13,17 +12,12 @@ if (!volumeNumber || !chapterNumber) {
   return Astro.redirect("/");
 }
 
-const db = getDb(Astro.locals.runtime.env.bagabondo_db);
-if (!db) {
-  throw new Error("Database not configured");
-}
-
-const volume = await getMangaVolumeByNumber(db, +volumeNumber);
+const volume = await getMangaVolumeByNumber(+volumeNumber);
 if (!volume) {
   return Astro.redirect("/");
 }
 
-const chapter = await getMangaChapterByNumber(db, +chapterNumber);
+const chapter = await getMangaChapterByNumber(+chapterNumber);
 if (!chapter) {
   return Astro.redirect(`/volume-${volume.number}`);
 }

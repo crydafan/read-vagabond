@@ -48,10 +48,7 @@ export const volumesTable = sqliteTable(
       .notNull()
       .default(sql`(unixepoch())`),
   },
-  (table) => [
-    unique().on(table.mangaId, table.number),
-    index("volumes_number_idx").on(table.number),
-  ],
+  (table) => [index("volumes_number_idx").on(table.number)],
 );
 
 export const chaptersTable = sqliteTable(

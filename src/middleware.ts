@@ -9,55 +9,37 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  const cache = context.locals.runtime.caches.default;
-
-  try {
-    const cachedResponse = await cache.match(context.url.href);
-    if (cachedResponse) {
-      return new Response(cachedResponse.body as any, {
-        status: cachedResponse.status,
-        statusText: cachedResponse.statusText,
-        headers: new Headers(cachedResponse.headers as any),
-      });
-    }
-  } catch (error) {}
-
   const response = await next();
 
   if (response.status !== 200) {
     return response;
   }
 
-  const newResponse = new Response(response.body, response);
-
   if (context.url.pathname === "/") {
     // 1 week
-    newResponse.headers.set(
+    response.headers.set(
       "Cache-Control",
       "public, max-age=604800, s-maxage=604800, stale-while-revalidate=604800",
     );
   } else if (context.url.pathname.includes("/chapter-")) {
     // 1 month
-    newResponse.headers.set(
+    response.headers.set(
       "Cache-Control",
       "public, max-age=2592000, s-maxage=2592000, stale-while-revalidate=31536000, immutable",
     );
   } else if (context.url.pathname.includes("/volume-")) {
     // 1 week
-    newResponse.headers.set(
+    response.headers.set(
       "Cache-Control",
       "public, max-age=604800, s-maxage=604800, stale-while-revalidate=2592000, immutable",
     );
   } else {
     // 1 week
-    newResponse.headers.set(
+    response.headers.set(
       "Cache-Control",
       "public, max-age=604800, s-maxage=604800, stale-while-revalidate=604800",
     );
   }
 
-  context.locals.runtime.ctx.waitUntil(
-    cache.put(context.url.href, newResponse.clone() as any),
-  );
-  return newResponse;
+  return response;
 });

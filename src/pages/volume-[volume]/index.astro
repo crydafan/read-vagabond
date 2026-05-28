@@ -1,4 +1,5 @@
 ---
+import type { GetStaticPaths } from "astro";
 import ChapterList from "../../components/ChapterList.astro";
 import VolumeCover from "../../components/VolumeCover.astro";
 import VolumeInformation from "../../components/VolumeInformation.astro";
@@ -6,7 +7,16 @@ import MainLayout from "../../layouts/MainLayout.astro";
 import {
   getMangaChaptersByVolumeNumber,
   getMangaVolumeByNumber,
+  getMangaVolumes,
 } from "../../lib/db";
+
+export const getStaticPaths = (async () => {
+  const volumes = await getMangaVolumes();
+  const paths = volumes.map((volume) => ({
+    params: { volume: String(volume.number) },
+  }));
+  return paths;
+}) satisfies GetStaticPaths;
 
 const { volume: volumeNumber } = Astro.params;
 

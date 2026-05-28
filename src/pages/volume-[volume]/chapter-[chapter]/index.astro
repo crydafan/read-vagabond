@@ -1,10 +1,37 @@
 ---
+import type { GetStaticPaths } from "astro";
 import ChapterLayout from "../../../layouts/ChapterLayout.astro";
 import {
   getMangaVolumeByNumber,
   getMangaChapterByNumber,
+  getMangaVolumes,
 } from "../../../lib/db";
 import { buildPageUrl } from "../../../lib/page";
+
+export const getStaticPaths = (async () => {
+  const volumes = await getMangaVolumes();
+  const paths: { params: { volume: string; chapter: string } }[] = [];
+
+  for (const volume of volumes) {
+    const firstChapter = volume.firstChapter ?? 0;
+    const lastChapter = volume.lastChapter ?? 0;
+
+    for (
+      let chapterNum = firstChapter;
+      chapterNum <= lastChapter;
+      chapterNum++
+    ) {
+      paths.push({
+        params: {
+          volume: String(volume.number),
+          chapter: String(chapterNum),
+        },
+      });
+    }
+  }
+
+  return paths;
+}) satisfies GetStaticPaths;
 
 const { volume: volumeNumber, chapter: chapterNumber } = Astro.params;
 

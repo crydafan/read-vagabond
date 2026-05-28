@@ -13,8 +13,7 @@ export default defineConfig({
     mode: "standalone",
   }),
 
-  // Enable SSR for all pages
-  output: "server",
+  output: "static",
 
   vite: {
     plugins: [tailwindcss()],

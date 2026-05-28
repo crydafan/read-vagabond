@@ -1,6 +1,30 @@
 import { sql, eq, asc, countDistinct, min, max } from "drizzle-orm";
-import { chaptersTable, volumesTable } from "../db/schema";
+import {
+  artistAlias,
+  authorAlias,
+  chaptersTable,
+  mangasTable,
+  volumesTable,
+} from "../db/schema";
 import { db } from "../db/client";
+
+export const getMangaById = async (mangaId: number) => {
+  const data = await db
+    .select({
+      id: mangasTable.id,
+      title: mangasTable.title,
+      description: mangasTable.description,
+      status: mangasTable.status,
+      createdAt: mangasTable.createdAt,
+      author: authorAlias.name,
+      artist: artistAlias.name,
+    })
+    .from(mangasTable)
+    .leftJoin(authorAlias, eq(mangasTable.authorId, authorAlias.id))
+    .leftJoin(artistAlias, eq(mangasTable.artistId, artistAlias.id))
+    .where(eq(mangasTable.id, mangaId));
+  return data[0];
+};
 
 export const getMangaLibraryCounts = async () => {
   const data = await db

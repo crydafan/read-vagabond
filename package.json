@@ -9,7 +9,6 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.12",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.11",
     "drizzle-orm": "^0.45.1",
@@ -18,7 +17,6 @@
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.8",
-    "wrangler": "^4.59.2"
+    "drizzle-kit": "^0.31.8"
   }
 }

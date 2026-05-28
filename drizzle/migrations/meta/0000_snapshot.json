@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "87a917a1-89cd-48d0-a19e-733dc395bd6b",
+  "id": "6ea60138-4166-4d6a-a9ee-80f0bd6def26",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "authors": {
@@ -45,6 +45,13 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "manga_id": {
+          "name": "manga_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "volume_id": {
           "name": "volume_id",
@@ -90,8 +97,37 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "chapters_number_idx": {
+          "name": "chapters_number_idx",
+          "columns": [
+            "number"
+          ],
+          "isUnique": false
+        },
+        "chapters_volume_id_number_unique": {
+          "name": "chapters_volume_id_number_unique",
+          "columns": [
+            "volume_id",
+            "number"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
+        "chapters_manga_id_mangas_id_fk": {
+          "name": "chapters_manga_id_mangas_id_fk",
+          "tableFrom": "chapters",
+          "tableTo": "mangas",
+          "columnsFrom": [
+            "manga_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "chapters_volume_id_volumes_id_fk": {
           "name": "chapters_volume_id_volumes_id_fk",
           "tableFrom": "chapters",
@@ -164,7 +200,16 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "mangas_author_id_title_unique": {
+          "name": "mangas_author_id_title_unique",
+          "columns": [
+            "author_id",
+            "title"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "mangas_author_id_authors_id_fk": {
           "name": "mangas_author_id_authors_id_fk",
@@ -237,7 +282,15 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "volumes_number_idx": {
+          "name": "volumes_number_idx",
+          "columns": [
+            "number"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "volumes_manga_id_mangas_id_fk": {
           "name": "volumes_manga_id_mangas_id_fk",

@@ -3,22 +3,15 @@ import { defineConfig } from "astro/config";
 
 import tailwindcss from "@tailwindcss/vite";
 
-import node from "@astrojs/node";
-
 // https://astro.build/config
 export default defineConfig({
   site: "https://readbagabondo.com",
-
-  adapter: node({
-    mode: "standalone",
-  }),
 
   output: "static",
 
   vite: {
     plugins: [tailwindcss()],
     build: {
-      // Optimize chunk size for better caching
       rollupOptions: {
         output: {
           manualChunks: undefined,

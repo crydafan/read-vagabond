@@ -1,1 +1,0 @@
-This API needs a rework. There are a ton of workarounds here and there.

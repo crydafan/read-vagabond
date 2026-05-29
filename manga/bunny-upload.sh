@@ -7,14 +7,19 @@ sync_chapter() {
 
     [ -d "$chapter" ] || return
 
+    # echo "Syncing $chapter to Bunny CDN..."
+
     rclone copy "$chapter" "bunny:$chapter" \
         --inplace \
         --size-only \
         --transfers 8 \
-        --no-traverse
+        --no-traverse \
+        -v \
+        --stats-one-line
 }
 
 export -f sync_chapter
 
 # Run multiple chapters in parallel (adjust -P for CPU / network)
-seq -w 1 322 | xargs -n1 -P4 -I{} bash -c 'sync_chapter "$@"' _ {}
+for d in chapter-*/; do printf '%s\n' "${d#chapter-}" | tr -d '/'; done \
+    | xargs -n1 -P4 -I{} bash -c 'sync_chapter "$@"' _ {}

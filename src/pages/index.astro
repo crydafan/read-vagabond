@@ -6,6 +6,21 @@ import CopyButton from "../components/CopyButton.astro";
 
 const { volumeCount, chapterCount } = await getMangaLibraryCounts();
 const volumes = await getMangaVolumes();
+
+const DONATION_WALLETS = [
+  {
+    label: "Bitcoin",
+    symbol: "BTC",
+    icon: "fab fa-bitcoin",
+    address: "bc1qn4y5dzqa24y75vg4hypc5lulsdv4qu82hf7ay7",
+  },
+  {
+    label: "Ethereum",
+    symbol: "ETH",
+    icon: "fab fa-ethereum",
+    address: "0xA06b1Dd54c656760C4A132cA6282970CC696B976",
+  },
+] as const;
 ---
 
 <MainLayout
@@ -124,20 +139,7 @@ const volumes = await getMangaVolumes();
         </p>
         <div class="flex flex-col gap-3">
           {
-            [
-              {
-                label: "Bitcoin",
-                symbol: "BTC",
-                icon: "fab fa-bitcoin",
-                address: "bc1qn4y5dzqa24y75vg4hypc5lulsdv4qu82hf7ay7",
-              },
-              {
-                label: "Ethereum",
-                symbol: "ETH",
-                icon: "fab fa-ethereum",
-                address: "0xA06b1Dd54c656760C4A132cA6282970CC696B976",
-              },
-            ].map((wallet) => (
+            DONATION_WALLETS.map((wallet) => (
               <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-2 px-4 bg-gray-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg">
                 <span class="inline-flex items-center gap-2 font-semibold text-gray-900 dark:text-white shrink-0 sm:w-25">
                   <i class={wallet.icon} />

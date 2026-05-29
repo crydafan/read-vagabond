@@ -1,9 +1,5 @@
-# manga volume directories
-vizbig-*/
-volume-*/
+# manga chapter directories
 chapter-*/
 
+# manga cover images
 covers/
-
-# log files
-r2-upload/uploaded.json

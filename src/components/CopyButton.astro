@@ -32,11 +32,14 @@ const { copyData, ariaLabel } = Astro.props;
       const label = button.querySelector(".copy-label");
       if (!label) return;
 
-      const original = label.textContent;
       label.textContent = "Copied!";
-      setTimeout(() => {
-        label.textContent = original;
-      }, 1500);
+      window.clearTimeout(Number(button.dataset.resetTimer ?? 0));
+      button.dataset.resetTimer = String(
+        window.setTimeout(() => {
+          label.textContent = "Copy";
+          delete button.dataset.resetTimer;
+        }, 1500),
+      );
     });
   });
 </script>

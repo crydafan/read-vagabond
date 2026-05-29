@@ -5,7 +5,6 @@ import {
   sqliteTable,
   text,
   unique,
-  alias,
 } from "drizzle-orm/sqlite-core";
 
 export const authorsTable = sqliteTable("authors", {
@@ -15,10 +14,6 @@ export const authorsTable = sqliteTable("authors", {
     .notNull()
     .default(sql`(unixepoch())`),
 });
-
-export const authorAlias = alias(authorsTable, "author");
-
-export const artistAlias = alias(authorsTable, "artist");
 
 export const mangasTable = sqliteTable(
   "mangas",

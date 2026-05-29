@@ -1,12 +1,15 @@
 import { sql, eq, asc, countDistinct, min, max } from "drizzle-orm";
 import {
-  artistAlias,
-  authorAlias,
+  authorsTable,
   chaptersTable,
   mangasTable,
   volumesTable,
 } from "../db/schema";
 import { db } from "../db/client";
+import { alias } from "drizzle-orm/sqlite-core";
+
+const authorAlias = alias(authorsTable, "author");
+const artistAlias = alias(authorsTable, "artist");
 
 export const getMangaById = async (mangaId: number) => {
   const data = await db

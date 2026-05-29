@@ -55,9 +55,7 @@ export const chaptersTable = sqliteTable(
   "chapters",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    mangaId: integer("manga_id")
-      .notNull()
-      .references(() => mangasTable.id),
+    // already has a reference to manga through volume, so we can get it from there
     volumeId: integer("volume_id")
       .notNull()
       .references(() => volumesTable.id),

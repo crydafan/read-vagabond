@@ -1,8 +1,35 @@
 import { sql, eq, asc, countDistinct, min, max } from "drizzle-orm";
-import { chaptersTable, volumesTable } from "../db/schema";
-import type { DrizzleD1Database } from "drizzle-orm/d1";
+import {
+  authorsTable,
+  chaptersTable,
+  mangasTable,
+  volumesTable,
+} from "../db/schema";
+import { db } from "../db/client";
+import { alias } from "drizzle-orm/sqlite-core";
 
-export const getMangaLibraryCounts = async (db: DrizzleD1Database) => {
+const authorAlias = alias(authorsTable, "author");
+const artistAlias = alias(authorsTable, "artist");
+
+export const getMangaById = async (mangaId: number) => {
+  const data = await db
+    .select({
+      id: mangasTable.id,
+      title: mangasTable.title,
+      description: mangasTable.description,
+      status: mangasTable.status,
+      createdAt: mangasTable.createdAt,
+      author: authorAlias.name,
+      artist: artistAlias.name,
+    })
+    .from(mangasTable)
+    .leftJoin(authorAlias, eq(mangasTable.authorId, authorAlias.id))
+    .leftJoin(artistAlias, eq(mangasTable.artistId, artistAlias.id))
+    .where(eq(mangasTable.id, mangaId));
+  return data[0];
+};
+
+export const getMangaLibraryCounts = async () => {
   const data = await db
     .select({
       volumeCount: countDistinct(volumesTable.id).as("volumeCount"),
@@ -14,7 +41,7 @@ export const getMangaLibraryCounts = async (db: DrizzleD1Database) => {
   return data[0];
 };
 
-export const getMangaVolumes = async (db: DrizzleD1Database) => {
+export const getMangaVolumes = async () => {
   const data = await db
     .select({
       number: volumesTable.number,
@@ -30,10 +57,7 @@ export const getMangaVolumes = async (db: DrizzleD1Database) => {
   return data;
 };
 
-export const getMangaVolumeById = async (
-  db: DrizzleD1Database,
-  volumeId: number,
-) => {
+export const getMangaVolumeById = async (volumeId: number) => {
   const data = await db
     .select({
       number: volumesTable.number,
@@ -49,10 +73,7 @@ export const getMangaVolumeById = async (
   return data[0];
 };
 
-export const getMangaVolumeByNumber = async (
-  db: DrizzleD1Database,
-  volumeNumber: number,
-) => {
+export const getMangaVolumeByNumber = async (volumeNumber: number) => {
   const data = await db
     .select({
       number: volumesTable.number,
@@ -68,10 +89,7 @@ export const getMangaVolumeByNumber = async (
   return data[0];
 };
 
-export const getMangaChaptersByVolumeId = async (
-  db: DrizzleD1Database,
-  volumeId: number,
-) => {
+export const getMangaChaptersByVolumeId = async (volumeId: number) => {
   const data = await db
     .select({
       number: chaptersTable.number,
@@ -84,10 +102,7 @@ export const getMangaChaptersByVolumeId = async (
   return data;
 };
 
-export const getMangaChaptersByVolumeNumber = async (
-  db: DrizzleD1Database,
-  volumeNumber: number,
-) => {
+export const getMangaChaptersByVolumeNumber = async (volumeNumber: number) => {
   const data = await db
     .select({
       number: chaptersTable.number,
@@ -101,10 +116,7 @@ export const getMangaChaptersByVolumeNumber = async (
   return data;
 };
 
-export const getMangaChapterById = async (
-  db: DrizzleD1Database,
-  chapterId: number,
-) => {
+export const getMangaChapterById = async (chapterId: number) => {
   const data = await db
     .select({
       title: chaptersTable.title,
@@ -117,10 +129,7 @@ export const getMangaChapterById = async (
   return data[0];
 };
 
-export const getMangaChapterByNumber = async (
-  db: DrizzleD1Database,
-  chapterNumber: number,
-) => {
+export const getMangaChapterByNumber = async (chapterNumber: number) => {
   const data = await db
     .select({
       title: chaptersTable.title,

@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3199dbca-ed89-4204-9adb-8f786b744788",
-  "prevId": "87a917a1-89cd-48d0-a19e-733dc395bd6b",
+  "id": "a968a371-861e-4099-96b6-23efd78871d9",
+  "prevId": "6ea60138-4166-4d6a-a9ee-80f0bd6def26",
   "tables": {
     "authors": {
       "name": "authors",
@@ -91,6 +91,13 @@
         }
       },
       "indexes": {
+        "chapters_number_idx": {
+          "name": "chapters_number_idx",
+          "columns": [
+            "number"
+          ],
+          "isUnique": false
+        },
         "chapters_volume_id_number_unique": {
           "name": "chapters_volume_id_number_unique",
           "columns": [
@@ -256,13 +263,12 @@
         }
       },
       "indexes": {
-        "volumes_manga_id_number_unique": {
-          "name": "volumes_manga_id_number_unique",
+        "volumes_number_idx": {
+          "name": "volumes_number_idx",
           "columns": [
-            "manga_id",
             "number"
           ],
-          "isUnique": true
+          "isUnique": false
         }
       },
       "foreignKeys": {

@@ -1,2 +1,0 @@
-If we want to add support for other works of the manga author and multi-language/localization we need a major API rewrite. The current version (v1) is filled with hardcoded values and workarounds. Leaving this here and we'll be updating this document with the design of
-the new API version (v2).

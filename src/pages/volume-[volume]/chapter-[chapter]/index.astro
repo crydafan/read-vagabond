@@ -1,11 +1,37 @@
 ---
+import type { GetStaticPaths } from "astro";
 import ChapterLayout from "../../../layouts/ChapterLayout.astro";
-import { getDb } from "../../../db/client";
 import {
   getMangaVolumeByNumber,
   getMangaChapterByNumber,
+  getMangaVolumes,
 } from "../../../lib/db";
 import { buildPageUrl } from "../../../lib/page";
+
+export const getStaticPaths = (async () => {
+  const volumes = await getMangaVolumes();
+  const paths: { params: { volume: string; chapter: string } }[] = [];
+
+  for (const volume of volumes) {
+    const firstChapter = volume.firstChapter ?? 0;
+    const lastChapter = volume.lastChapter ?? 0;
+
+    for (
+      let chapterNum = firstChapter;
+      chapterNum <= lastChapter;
+      chapterNum++
+    ) {
+      paths.push({
+        params: {
+          volume: String(volume.number),
+          chapter: String(chapterNum),
+        },
+      });
+    }
+  }
+
+  return paths;
+}) satisfies GetStaticPaths;
 
 const { volume: volumeNumber, chapter: chapterNumber } = Astro.params;
 
@@ -13,17 +39,12 @@ if (!volumeNumber || !chapterNumber) {
   return Astro.redirect("/");
 }
 
-const db = getDb(Astro.locals.runtime.env.bagabondo_db);
-if (!db) {
-  throw new Error("Database not configured");
-}
-
-const volume = await getMangaVolumeByNumber(db, +volumeNumber);
+const volume = await getMangaVolumeByNumber(+volumeNumber);
 if (!volume) {
   return Astro.redirect("/");
 }
 
-const chapter = await getMangaChapterByNumber(db, +chapterNumber);
+const chapter = await getMangaChapterByNumber(+chapterNumber);
 if (!chapter) {
   return Astro.redirect(`/volume-${volume.number}`);
 }

@@ -25,3 +25,5 @@ wrangler.toml.local
 
 # jetbrains setting folder
 .idea/
+
+*.db

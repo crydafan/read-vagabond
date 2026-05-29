@@ -4,7 +4,11 @@ This document contains guidelines and commands for agentic coding agents working
 
 ## Project Overview
 
-This is a manga reader application built with Astro, deployed on Cloudflare Workers. It serves Takehiko Inoue's Vagabond manga with a minimalist, high-quality reading experience. The application uses D1 database for metadata and R2 for image storage.
+This is a manga reader application built with Astro, serving Takehiko Inoue's Vagabond manga with a minimalist, high-quality reading experience. The reader is a **fully static site** (Astro SSG): all pages are pre-rendered at build time from a local SQLite database, and manga images are served from Bunny CDN.
+
+A separate Cloudflare Worker (`mihon/`) exposes a small read-only API consumed by the Mihon/Keiyoushi browser extension. This is the only part of the project still running on Cloudflare.
+
+> **Note:** This project was migrated off Cloudflare Workers/Pages (SSR, D1, R2). If you find references to D1, R2, the Cloudflare adapter, `Astro.locals.runtime`, or cache middleware in older docs or code, they are legacy and should not be reintroduced in the main app.
 
 ## Build & Development Commands
 
@@ -12,270 +16,234 @@ This is a manga reader application built with Astro, deployed on Cloudflare Work
 
 ```bash
 # Development
-pnpm dev              # Start development server
-pnpm build            # Build for production
-pnpm preview          # Preview production build locally
+pnpm dev              # Start Astro dev server
+pnpm build            # Build the static site to dist/
+pnpm preview          # Preview the production build locally
 
 # Astro CLI
 pnpm astro <command>  # Run any Astro CLI command
-
-# Cloudflare testing
-pnpm wrangler dev     # Local development with Workers runtime (includes local D1 database)
 ```
 
 ### Database Commands
 
+The reader reads from a local SQLite file (`local.db`, committed to the repo) via Drizzle ORM. Schema is defined in `src/db/schema.ts`; the Drizzle client is in `src/db/client.ts`.
+
 ```bash
-# Run migrations (local)
-for migration in drizzle/migrations/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$migration"
-done
+# Generate a migration from schema changes (src/db/schema.ts)
+pnpm drizzle-kit generate
 
-# Run seeds (local)
-for seed in seeds/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$seed"
-done
+# Apply migrations to local.db
+pnpm drizzle-kit migrate
 
-# Reset local database
-rm -rf .wrangler/state/
+# Inspect/browse the database
+pnpm drizzle-kit studio
 ```
+
+Seeds live in `seeds/` and are applied directly to the SQLite file:
+
+```bash
+sqlite3 local.db < seeds/0000_seed_vagabond_metadata.sql
+```
+
+Because the static build reads `local.db` at build time, the database file is committed so builds are reproducible. Regenerate/seed it locally if you change the schema or data, then commit the updated `local.db`.
 
 ### Testing
 
 No dedicated test framework is currently configured. Manual testing should be performed by:
 
 1. Running `pnpm dev` and testing all user flows
-2. Testing API endpoints directly
-3. Verifying responsive design across devices
-4. Testing Cloudflare deployment with `wrangler dev`
-
-### Database Operations
-
-```bash
-# Run migrations (if needed)
-wrangler d1 execute vagabond-db --file=./migrations/0001_init.sql
-wrangler d1 execute vagabond-db --file=./migrations/0002_seed_chapters.sql
-# etc.
-```
+2. Running `pnpm build && pnpm preview` to validate the static output
+3. Verifying responsive design across devices and both light/dark themes
 
 ## Architecture & Tech Stack
 
-- **Framework**: Astro (v5+) with SSR mode
-- **Deployment**: Cloudflare Workers with Pages adapter
-- **Database**: Cloudflare D1 (SQLite)
-- **Storage**: Cloudflare R2 for manga images
-- **Styling**: Tailwind CSS v4 with Flowbite components
-- **TypeScript**: Strict mode enabled
+- **Framework**: Astro v6 with `output: "static"` (SSG)
+- **Database**: Local SQLite (`local.db`) accessed at build time via Drizzle ORM + `@libsql/client`
+- **Migrations**: drizzle-kit, output to `drizzle/migrations/`
+- **Image CDN**: Bunny CDN (`https://vagabond.b-cdn.net/`)
+- **Styling**: Tailwind CSS v4 (via `@tailwindcss/vite`) with Flowbite components
+- **State**: nanostores (reader UI state)
+- **Mihon API**: separate Cloudflare Worker (`mihon/`) built with Hono, backed by D1
+- **Package manager**: pnpm workspace (`pnpm-workspace.yaml`) — root reader app + `mihon` worker
 
 ## Code Style Guidelines
 
 ### File Organization
 
-```
+```txt
 src/
-├── pages/              # Astro file-based routing
-│   ├── api/           # API endpoints
-│   └── [...route].astro # Dynamic routes
-├── lib/               # Shared utilities and database functions
-├── styles/            # Global styles and Tailwind imports
-├── middleware.ts      # Astro middleware for caching headers
-└── env.d.ts          # TypeScript environment declarations
+├── pages/                          # Astro file-based routing (all statically rendered)
+│   ├── index.astro                 # Homepage
+│   ├── 404.astro
+│   ├── sitemap.xml.ts              # Generated sitemap
+│   ├── volume-[volume]/            # Volume + chapter routes (getStaticPaths)
+│   └── volume-[volume]/chapter-[chapter]/
+├── layouts/                        # BaseLayout, MainLayout, ChapterLayout
+├── components/                     # UI components (.astro)
+├── feature/reader/store.ts         # nanostores reader state
+├── lib/                            # Data access (db.ts), page URLs (page.ts), metadata
+├── db/                             # Drizzle: schema.ts + client.ts
+├── styles/                         # Global styles and Tailwind imports
+└── env.d.ts                        # Astro client type reference
+
+drizzle/migrations/                 # Generated SQL migrations
+seeds/                              # SQL seed data for local.db
+mihon/                              # Cloudflare Worker (Hono) for the extension API
+manga/                              # Image source + bunny-upload.sh (rclone -> Bunny CDN)
 ```
 
 ### Imports
 
-- Use relative imports for internal modules: `import { getVolumes } from "../lib/db"`
-- Use absolute imports for dependencies: `import type { APIRoute } from "astro"`
-- Group imports: 1) Node/Astro imports, 2) third-party, 3) local imports
+- Use relative imports for internal modules: `import { getMangaVolumes } from "../lib/db"`
+- Use absolute imports for dependencies: `import type { GetStaticPaths } from "astro"`
+- Group imports: 1) Astro imports, 2) third-party, 3) local imports
 - Type imports use `import type` when possible
 
 ### TypeScript Patterns
 
-- Use strict TypeScript config (extends `astro/tsconfigs/strict`)
-- Define explicit types for API responses and database queries
-- Use type annotations for function parameters and returns
-- Leverage Astro's built-in types: `APIRoute`, `AstroGlobal`, `APIContext`
+- Strict TypeScript config (extends `astro/tsconfigs/strict`)
+- Prefer letting Drizzle infer query result types; add explicit annotations for function parameters and returns
+- Leverage Astro's built-in types: `GetStaticPaths`, `APIRoute`, `AstroGlobal`
 
 ### Astro Components
 
-- Use frontmatter (---) for server-side logic
-- Import global CSS at top: `import "../styles/global.css"`
+- Use frontmatter (---) for build-time logic and data fetching
+- Pages with dynamic params (`[volume]`, `[chapter]`) **must** export `getStaticPaths` so every page is pre-rendered
 - Use HTML5 semantic elements appropriately
-- Include proper meta tags for SEO and accessibility
-- Use `Astro.redirect()` for invalid routes/params
+- Include proper meta tags for SEO and accessibility (see `MetadataTags`)
+- Use `Astro.redirect("/")` for invalid params
 
-### Database Operations
+### Database Operations (Drizzle ORM)
 
-- **Primary Database**: `Astro.locals.runtime?.env?.bagabondo_db` (main application)
-- **Legacy Database**: `Astro.locals.runtime?.env?.vagabond_db` (API v1 only, temporary during migration)
-- Always validate database exists before use
-- Use prepared statements with parameter binding for security
-- Return `null` for not-found results, handle in calling code
-- Use TypeScript generics for query result typing
-- **Migration Note**: API will migrate to `bagabondo_db` and Drizzle ORM once v2 specification is complete
-
-### API Routes
-
-- Export `GET`, `POST`, etc. functions of type `APIRoute`
-- Return proper HTTP status codes (404 for not found, 500 for errors)
-- Set appropriate `Content-Type` headers
-- Include cache headers for static content
-- Use JSON error responses with descriptive messages
+- Import the shared client from `src/db/client.ts` (`db`) and tables from `src/db/schema.ts`
+- All query helpers live in `src/lib/db.ts` — add new queries there rather than querying inline in pages
+- Use Drizzle's query builder (`db.select(...).from(...).where(eq(...))`); avoid raw SQL except where aggregation requires it
+- Table aliases (e.g. author/artist on `authorsTable`) are defined in `src/lib/db.ts`
+- Helpers return a single row or `undefined` for by-id/by-number lookups; handle the empty case in the caller
 
 ### Styling Guidelines
 
 - Use Tailwind utility classes for layout and spacing
 - Use Flowbite components for UI elements
+- Support light/dark themes (see `ThemeToggle`); use theme-aware utility classes
 - Custom CSS only for animations or complex interactions
 - Mobile-first responsive design approach
-- Semantic color palette: grays for UI, brand colors for accents
-
-### Error Handling
-
-- Validate required environment variables and database connections
-- Use try-catch for async operations that might fail
-- Return user-friendly error pages via Astro.redirect()
-- Log errors appropriately for debugging
-- Gracefully handle missing images/data
-
-### Performance & Caching
-
-- Use `loading="lazy"` for images below fold
-- Implement caching headers via middleware
-- Optimize images for web delivery
-
-### Caching Strategy
-
-The application implements Cloudflare Cache API with different TTLs per route:
-
-- **Homepage** (`/`): 1 week cache
-- **Chapter pages** (`/volume-[volume]/chapter-[chapter]`): 1 month cache (immutable flag)
-- **Volume pages** (`/volume-[volume]`): 1 week cache (immutable flag)
-- **API endpoints**: Cached based on content type and update frequency
-
-Implemented in `src/middleware.ts` for request-time cache header injection.
-
-- Use Astro's `is:inline` sparingly for critical scripts
-- Leverage Cloudflare's edge caching
 
 ### Naming Conventions
 
-- Files: kebab-case for pages (`volume-[volume].astro`), camelCase for functions
+- Files: kebab-case for pages/routes (`volume-[volume].astro`), PascalCase for components/layouts
 - Variables: camelCase, descriptive names
 - Constants: UPPER_SNAKE_CASE for static values
-- Functions: verb-based names (`getVolumes`, `getChapterDetails`)
-- CSS classes: Tailwind utilities, custom classes use kebab-case
+- Functions: verb-based names (`getMangaVolumes`, `buildPageUrl`)
 
 ### Security Best Practices
 
-- Sanitize all user input and URL parameters
-- Use parameterized queries for database operations
-- Validate route parameters before processing
-- Never expose sensitive data or API keys in client code
-- Implement proper CORS headers for API endpoints
+- Validate and sanitize route parameters before use
+- Use Drizzle's parameterized query builder (never string-concatenate SQL)
+- Never expose secrets in client code or commit them
+- For the mihon Worker, validate path params and return appropriate status codes
 
 ## State Management
 
 ### Reader State (nanostores)
 
-The application uses nanostores for lightweight reactive state management:
+The reader uses nanostores for lightweight reactive client-side state.
+
+**Location**: `src/feature/reader/store.ts`
 
 ```typescript
-// Reader store atoms
-const currentPage = atom<number>(0); // Current page index
-const percentageRead = atom<number>(0); // Reading progress percentage
-const navbarVisibility = atom<boolean>(true); // UI navbar toggle
+const currentPage = atom<number>(0);          // Current page index
+const percentageRead = atom<number>(0);        // Reading progress percentage
+const navbarVisibility = atom<boolean>(true);  // UI navbar toggle
 const isProgrammaticScroll = atom<boolean>(false); // Scroll source flag
 ```
 
 Usage:
 
 - Import atoms from `src/feature/reader/store.ts`
-- Subscribe to changes with `subscribe()` or use in Astro components
-- Update state with `set()` or `update()`
+- Subscribe with `subscribe()` and update with `set()` / `update()`
 - Keep store values immutable
 
-**Location**: `src/feature/reader/store.ts`
+## Components & Layouts
 
-## Components & Architecture
+### Layouts (`src/layouts/`)
 
-### Astro Components
+- `BaseLayout.astro` — base HTML shell, head, theme handling
+- `MainLayout.astro` — homepage/volume pages layout
+- `ChapterLayout.astro` — reading interface layout
 
-The application includes 12 Astro components for UI rendering:
+### Components (`src/components/`)
 
-- `ArrowIcon.astro` - Navigation arrow icon
-- `ArrowKeysHint.astro` - Keyboard navigation hint text
-- `ChapterList.astro` - List of chapters for a volume
-- `ChapterNavigation.astro` - Chapter navigation controls
-- `Footer.astro` - Page footer
-- `MetadataTags.astro` - SEO meta tags
-- `Navigation.astro` - Main navigation bar
-- `PageViewer.astro` - Cascade reader component (main reading interface)
-- `ProgressBar.astro` - Reading progress bar
-- `VolumeCard.astro` - Volume preview card
-- `VolumeCover.astro` - Volume cover image
-- `VolumeInformation.astro` - Volume metadata display
-
-All components are located in `src/components/`.
+- `ArrowIcon.astro` — navigation arrow icon
+- `ArrowKeysHint.astro` — keyboard navigation hint
+- `ChapterList.astro` — list of chapters for a volume
+- `ChapterNavigation.astro` — chapter navigation controls
+- `CopyButton.astro` — copy-to-clipboard (used for crypto donation addresses)
+- `Footer.astro` — page footer
+- `MetadataTags.astro` — SEO meta tags and structured data
+- `Navigation.astro` — main navigation bar
+- `PageViewer.astro` — cascade reader component (main reading interface)
+- `ProgressBar.astro` — reading progress bar
+- `ThemeToggle.astro` — light/dark theme switch
+- `VolumeCard.astro` — volume preview card
+- `VolumeCover.astro` — volume cover image
+- `VolumeInformation.astro` — volume metadata display
 
 ## Image Delivery
 
-### Content Delivery Network (CDN)
+Manga images are served from **Bunny CDN**:
 
-Manga images are served from external CDN:
+- **Cover URL**: `https://vagabond.b-cdn.net/covers/volume-<n>.jpg`
+- **Page URL**: `https://vagabond.b-cdn.net/chapter-<chapter>/page-<page>.png`
+- URL builders live in `src/lib/page.ts` (`buildVolumeCoverUrl`, `buildPageUrl`)
 
-- **CDN URL**: `https://bucket.readbagabondo.com/`
-- **Backend**: Cloudflare R2 object storage
-- **Fallback**: Implement proper fallback handling for missing images
-- **Optimization**: Images are optimized for web delivery (compression, format negotiation)
+### Uploading images
+
+Source images live under `manga/chapter-*/`. They are synced to Bunny CDN with rclone via `manga/bunny-upload.sh` (configure a `bunny:` rclone remote). **No scans are committed to the repository.**
 
 ### Image Loading Strategy
 
 - Use `loading="lazy"` for chapter images to optimize initial page load
 - Preload cover images for improved perceived performance
-- Implement lazy-loading for pagination to conserve bandwidth
 
 ## SEO & Structured Data
-
-### Metadata & Schemas
-
-The application implements comprehensive structured data for search engines:
 
 **Location**: `src/lib/metadata.ts`
 
 Supported schemas:
 
-- **WebSite schema**: Site-level metadata and search action
-- **ComicSeries schema**: Vagabond series metadata
-- **BreadcrumbList**: Navigation breadcrumbs (volume, chapter)
-- **Book schema**: Per-volume metadata
-- **ComicIssue schema**: Per-chapter metadata
-
-**Note**: Chapter count is currently hardcoded to 327; update this when retrieving from database.
+- **WebSite** — site-level metadata and search action
+- **ComicSeries** — Vagabond series metadata
+- **BreadcrumbList** — navigation breadcrumbs (volume, chapter)
+- **Book** — per-volume metadata
+- **ComicIssue** — per-chapter metadata
 
 Usage:
 
-- Import metadata functions in page components
-- Use `<MetadataTags>` component to inject structured data into page head
+- Inject structured data via the `<MetadataTags>` component in the page head
+- A `sitemap.xml` is generated at `src/pages/sitemap.xml.ts`
 - Verify structured data with Google Rich Results Test
 
-## TypeScript Environment
+## Mihon API Worker (`mihon/`)
 
-### Type Declarations
+A small read-only HTTP API consumed by the Mihon/Keiyoushi browser extension.
 
-Custom TypeScript definitions for Cloudflare Workers and Astro runtime:
+- **Stack**: Cloudflare Worker + Hono, backed by D1 (`bagabondo-db`)
+- **Config**: `mihon/wrangler.jsonc` (binding `bagabondo_db`)
+- **Routes** (`mihon/src/index.ts`):
+  - `GET /mangas`
+  - `GET /mangas/:mangaId`
+  - `GET /mangas/:mangaId/chapters`
+  - `GET /mangas/:mangaId/chapters/:chapterId`
+- **Commands** (run from `mihon/`):
 
-- `src/env.d.ts` - Astro environment and runtime type declarations
-- `worker-configuration.d.ts` - Cloudflare Workers type definitions
-- Database bindings accessed via `Astro.locals.runtime?.env?.<binding_name>`
+```bash
+pnpm wrangler dev                 # Local development
+pnpm wrangler deploy --minify     # Deploy
+pnpm wrangler types               # Regenerate CloudflareBindings types
+```
 
-### Security Best Practices
-
-- Sanitize all user input and URL parameters
-- Use parameterized queries for database operations
-- Validate route parameters before processing
-- Never expose sensitive data or API keys in client code
-- Implement proper CORS headers for API endpoints
+When changing the API contract, document breaking changes and notify external integration maintainers (Keiyoushi extension).
 
 ## Special Considerations
 
@@ -283,32 +251,15 @@ Custom TypeScript definitions for Cloudflare Workers and Astro runtime:
 
 - This application serves copyrighted manga content for personal reference only
 - All content must be properly licensed or fall under fair use
-- Never include actual manga scans in the repository
+- **Never include actual manga scans in the repository**
 - Respect copyright notices and licensing terms
-
-### Cloudflare Integration
-
-- D1 database bindings are configured in `wrangler.jsonc`
-- Environment variables accessed via `Astro.locals.runtime.env`
-- Use `wrangler` CLI for local development with `pnpm wrangler dev`
-- Production deployment is automatic on merge to `main` branch
-- Assets are served from Cloudflare's edge network
-
-### Content Delivery
-
-- Images served from R2 CDN at `https://bucket.readbagabondo.com/`
-- Implement proper fallbacks for missing content
-- Use appropriate caching strategies for different content types
-- Optimize for both mobile and desktop reading experiences
 
 ## Deployment Notes
 
-- **Production deployment**: Automatic on merge to `main` branch
-- **Database migrations**: Run locally with `pnpm wrangler d1 execute` before deployment
-- **Assets**: Automatically uploaded during build process
-- **Monitoring**: Check Cloudflare Analytics for performance metrics
-- **Configuration**: Keep wrangler.jsonc in sync with production settings
-- **No manual deployment needed**: Cloudflare Workers handles all production infrastructure
+- **Reader**: `pnpm build` produces a static site in `dist/` that can be served from any static host or CDN. (Cloudflare Pages/Workers auto-deploy and the previous Docker/nginx setup have been removed; there is no in-repo CI deploy config on this branch.)
+- **Database**: regenerate/seed `local.db` locally and commit it; the static build reads it at build time
+- **Images**: sync to Bunny CDN via `manga/bunny-upload.sh`
+- **Mihon Worker**: deployed separately to Cloudflare with `pnpm wrangler deploy --minify` from `mihon/`
 
 ## Development Workflow
 
@@ -318,80 +269,47 @@ This project uses trunk-based development with `main` as the primary branch:
 
 - All feature branches are created from `main`
 - All PRs merge directly to `main`
-- Every merge to `main` triggers automatic production deployment
 - No long-lived development branches
 
 **Branch strategy**:
 
-- `main`: Production trunk (all development happens here)
-- `feat/*`: Short-lived feature branches
-- `fix/*`: Short-lived bug fix branches
-- `mihon-api-v2/*`: Short-lived API v2 feature branches
-- `docs/*`: Documentation update branches
+- `main`: production trunk
+- `feat/*`: short-lived feature branches
+- `fix/*`: short-lived bug fix branches
+- `infra/*`: infrastructure/migration branches
+- `docs/*`: documentation update branches
 
 **Workflow**:
 
-1. Create feature branch from `main`
-2. Develop and test locally
-3. Open PR targeting `main`
-4. CodeRabbit reviews + Cloudflare build checks
+1. Create a branch from `main`
+2. Develop and test locally (`pnpm dev`, `pnpm build && pnpm preview`)
+3. Open a PR targeting `main`
+4. CodeRabbit review + build checks
 5. Maintainer approval required
-6. Merge to `main` → automatic deployment
-
-### Feature Flags
-
-For incomplete or risky features that need to be merged before they're user-ready:
-
-**Implementation**:
-
-```typescript
-const ENABLE_FEATURE = import.meta.env.PUBLIC_ENABLE_FEATURE === "true";
-
-if (ENABLE_FEATURE) {
-  // Feature code
-}
-```
-
-**Usage**:
-
-- Use environment variables to toggle features
-- Keep features disabled in production until thoroughly tested
-- Deploy code to `main` but activate only when ready
-- Ideal for: large features requiring multiple PRs, A/B testing, gradual rollouts
+6. Merge to `main`
 
 ### Breaking Changes
 
-When implementing breaking API changes:
+When changing the mihon API or database schema:
 
-- Version API endpoints (`/api/v1/`, `/api/v2/`)
-- Document all breaking changes in PR description
-- Provide migration guide for external integrations
+- Document all breaking changes in the PR description
+- Provide a migration path where relevant
 - Notify external integration maintainers (Keiyoushi extension)
 - Require maintainer approval for database schema changes
 
 ### PR Testing
 
-**Local testing** (test your own changes):
+**Local testing** (your own changes):
 
 ```bash
-pnpm dev                      # Astro dev server
-pnpm wrangler dev             # Cloudflare Workers runtime
-pnpm build && pnpm preview    # Production build
+pnpm dev                       # Astro dev server
+pnpm build && pnpm preview     # Static production build
 ```
 
 **Testing others' PRs** (for code review):
 
 ```bash
-# Using GitHub CLI
 gh pr checkout <pr-number>
-
-# Or manually
-git fetch origin pull/<pr-number>/head:pr-<pr-number>
-git checkout pr-<pr-number>
-
-# Then test
 pnpm install
 pnpm dev
 ```
-
-**All merges require**: CodeRabbit review passed + Cloudflare build successful + maintainer approval.

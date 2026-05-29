@@ -48,19 +48,14 @@ export const volumesTable = sqliteTable(
       .notNull()
       .default(sql`(unixepoch())`),
   },
-  (table) => [
-    unique().on(table.mangaId, table.number),
-    index("volumes_number_idx").on(table.number),
-  ],
+  (table) => [index("volumes_number_idx").on(table.number)],
 );
 
 export const chaptersTable = sqliteTable(
   "chapters",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    mangaId: integer("manga_id")
-      .notNull()
-      .references(() => mangasTable.id),
+    // already has a reference to manga through volume, so we can get it from there
     volumeId: integer("volume_id")
       .notNull()
       .references(() => volumesTable.id),

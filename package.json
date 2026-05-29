@@ -9,16 +9,15 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.12",
+    "@libsql/client": "^0.17.3",
     "@tailwindcss/vite": "^4.1.18",
-    "astro": "^5.16.11",
+    "astro": "^6.3.8",
     "drizzle-orm": "^0.45.1",
     "flowbite": "^4.0.1",
     "nanostores": "^1.1.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.8",
-    "wrangler": "^4.59.2"
+    "drizzle-kit": "^0.31.8"
   }
 }

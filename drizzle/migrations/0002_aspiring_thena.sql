@@ -1,1 +1,0 @@
-ALTER TABLE `chapters` ADD `manga_id` integer REFERENCES mangas(id);

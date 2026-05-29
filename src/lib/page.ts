@@ -5,7 +5,6 @@ export const buildPageUrl = ({
   chapter,
   page,
 }: {
-  volume: number;
   chapter: number;
   page: number;
 }): string =>

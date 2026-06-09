@@ -19,10 +19,23 @@ app.use(async (c, next) => {
   await next();
 });
 
+const PAGE_SIZE = 20;
+
 app.get("/mangas", async (c) => {
+  const q = c.req.query("q")?.trim();
+  const page = Math.max(1, Number(c.req.query("page")) || 1);
+
   const mangas = await getMangas(c.var.db);
+
+  const filtered = q
+    ? mangas.filter((manga) => manga.title === q)
+    : mangas;
+
+  const start = (page - 1) * PAGE_SIZE;
+  const paginated = filtered.slice(start, start + PAGE_SIZE);
+
   return c.json(
-    mangas.map((manga) => ({
+    paginated.map((manga) => ({
       ...manga,
       status: "hiatus",
       cover: "https://pub.moleve.net/covers/volume-37.jpg",

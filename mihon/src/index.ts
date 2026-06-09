@@ -8,7 +8,9 @@ import {
   getMangas,
 } from "../../db/queries";
 
-const app = new Hono<{ Bindings: CloudflareBindings; Variables: { db: Db } }>();
+const app = new Hono<{ Bindings: CloudflareBindings; Variables: { db: Db } }>().basePath(
+  "/api/mihon",
+);
 
 app.use(trimTrailingSlash());
 

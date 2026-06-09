@@ -5,21 +5,6 @@ import { getMangaLibraryCounts, getMangaVolumes } from "../lib/db";
 
 const { volumeCount, chapterCount } = await getMangaLibraryCounts();
 const volumes = await getMangaVolumes();
-
-const DONATION_WALLETS = [
-  {
-    label: "Bitcoin",
-    symbol: "BTC",
-    icon: "fab fa-bitcoin",
-    address: "bc1qn4y5dzqa24y75vg4hypc5lulsdv4qu82hf7ay7",
-  },
-  {
-    label: "Ethereum",
-    symbol: "ETH",
-    icon: "fab fa-ethereum",
-    address: "0xA06b1Dd54c656760C4A132cA6282970CC696B976",
-  },
-] as const;
 ---
 
 <MainLayout

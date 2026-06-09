@@ -8,9 +8,10 @@ import {
   getMangas,
 } from "../../db/queries";
 
-const app = new Hono<{ Bindings: CloudflareBindings; Variables: { db: Db } }>().basePath(
-  "/api/mihon",
-);
+const app = new Hono<{
+  Bindings: CloudflareBindings;
+  Variables: { db: Db };
+}>().basePath("/api/mihon");
 
 app.use(trimTrailingSlash());
 
@@ -28,7 +29,7 @@ app.get("/mangas", async (c) => {
   const mangas = await getMangas(c.var.db);
 
   const filtered = q
-    ? mangas.filter((manga) => manga.title === q)
+    ? mangas.filter((manga) => manga.title.includes(q))
     : mangas;
 
   const start = (page - 1) * PAGE_SIZE;

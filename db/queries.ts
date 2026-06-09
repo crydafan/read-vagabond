@@ -192,7 +192,7 @@ export const getMangaChaptersByMangaId = async (
     .innerJoin(volumesTable, eq(volumesTable.id, chaptersTable.volumeId))
     .where(eq(chaptersTable.mangaId, mangaId))
     .orderBy(desc(chaptersTable.number));
-  return data[0];
+  return data;
 };
 
 export const getMangaChapterByMangaIdAndChapterId = async (

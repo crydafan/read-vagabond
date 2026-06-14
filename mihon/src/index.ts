@@ -63,7 +63,12 @@ app.get("/mangas/:mangaId/chapters", async (c) => {
   if (!chapters) {
     return c.text("Manga not found", 404);
   }
-  return c.json(chapters);
+  return c.json(
+    chapters.map((chapter) => ({
+      ...chapter,
+      title: `Vol. ${chapter.volume} Ch. ${chapter.number} - ${chapter.title}`,
+    })),
+  );
 });
 
 app.get("/mangas/:mangaId/chapters/:chapterId", async (c) => {
@@ -76,7 +81,10 @@ app.get("/mangas/:mangaId/chapters/:chapterId", async (c) => {
   if (!chapter) {
     return c.text("Chapter not found", 404);
   }
-  return c.json(chapter);
+  return c.json({
+    ...chapter,
+    title: `Vol. ${chapter.volume} Ch. ${chapter.number} - ${chapter.title}`,
+  });
 });
 
 export default app;

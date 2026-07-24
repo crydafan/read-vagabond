@@ -4,6 +4,7 @@ import ChapterLayout from "../../../layouts/ChapterLayout.astro";
 import {
   getMangaVolumeByNumber,
   getMangaChapterByNumber,
+  getChapterNavByNumber,
   getMangaVolumes,
 } from "../../../lib/db";
 import { buildPageUrl } from "../../../lib/page";
@@ -59,6 +60,13 @@ if (chapter.number > lastChapter || chapter.number < firstChapter) {
 const prevChapter = chapter.number > firstChapter ? chapter.number - 1 : null;
 const nextChapter = chapter.number < lastChapter ? chapter.number + 1 : null;
 
+// Cross-volume links for the end-of-chapter navigation bar. Chapters are
+// numbered contiguously across the whole series, so the neighbours are simply
+// number ± 1; the lookup resolves each to its volume (and returns undefined at
+// the very first/last chapter, which renders as a start/end state).
+const prevNav = (await getChapterNavByNumber(chapter.number - 1)) ?? null;
+const nextNav = (await getChapterNavByNumber(chapter.number + 1)) ?? null;
+
 const pagesUrl = Array.from({ length: chapter.pageCount }, (_, i) =>
   buildPageUrl({
     volume: volume.number,
@@ -90,4 +98,6 @@ const pagesUrl = Array.from({ length: chapter.pageCount }, (_, i) =>
   }}
   prevChapter={prevChapter}
   nextChapter={nextChapter}
+  prevNav={prevNav}
+  nextNav={nextNav}
 />

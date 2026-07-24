@@ -4,6 +4,8 @@ import ChapterNavigation from "../components/ChapterNavigation.astro";
 import ProgressBar from "../components/ProgressBar.astro";
 import PageViewer from "../components/PageViewer.astro";
 import ArrowKeysHint from "../components/ArrowKeysHint.astro";
+import ChapterEndNavigation from "../components/ChapterEndNavigation.astro";
+import type { ChapterLink } from "../components/ChapterEndNavigation.astro";
 import type { Props as BaseLayoutProps } from "./BaseLayout.astro";
 
 export interface Props extends BaseLayoutProps {
@@ -15,9 +17,12 @@ export interface Props extends BaseLayoutProps {
   };
   prevChapter: number | null;
   nextChapter: number | null;
+  prevNav: ChapterLink | null;
+  nextNav: ChapterLink | null;
 }
 
-const { volume, chapter, prevChapter, nextChapter } = Astro.props;
+const { volume, chapter, prevChapter, nextChapter, prevNav, nextNav } =
+  Astro.props;
 ---
 
 <BaseLayout {...Astro.props}>
@@ -36,6 +41,7 @@ const { volume, chapter, prevChapter, nextChapter } = Astro.props;
 
   <main data-page-count={chapter.pagesUrl.length}>
     <PageViewer pagesUrl={chapter.pagesUrl} />
+    <ChapterEndNavigation volume={volume} prev={prevNav} next={nextNav} />
     <ArrowKeysHint />
   </main>
 </BaseLayout>

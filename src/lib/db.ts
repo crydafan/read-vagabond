@@ -36,3 +36,7 @@ export async function getMangaChapterById(chapterId: number) {
 export async function getMangaChapterByNumber(chapterNumber: number) {
   return queries.getMangaChapterByNumber(db, chapterNumber);
 }
+
+export async function getChapterNavByNumber(chapterNumber: number) {
+  return queries.getChapterNavByNumber(db, chapterNumber);
+}

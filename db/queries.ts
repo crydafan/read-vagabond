@@ -174,6 +174,22 @@ export const getMangaChapterByNumber = async (
   return data[0];
 };
 
+export const getChapterNavByNumber = async (
+  db: Database,
+  chapterNumber: number,
+) => {
+  const data = await db
+    .select({
+      number: chaptersTable.number,
+      title: chaptersTable.title,
+      volume: volumesTable.number,
+    })
+    .from(chaptersTable)
+    .innerJoin(volumesTable, eq(volumesTable.id, chaptersTable.volumeId))
+    .where(eq(chaptersTable.number, chapterNumber));
+  return data[0];
+};
+
 export const getMangaChaptersByMangaId = async (
   db: Database,
   mangaId: number,

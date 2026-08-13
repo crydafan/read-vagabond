@@ -5,7 +5,7 @@
 // offset=1 => page 1 (index 0) stands alone, then pairs: [[0],[1,2],[3,4],...]
 // This mirrors how a physical volume opens on a single page and gives interior
 // double-page splash art the best chance of landing together on one facing row.
-export function computeSpreads(pageCount: number, offset = 1): number[][] {
+export function computeSpreads(pageCount: number, offset: number = 1): number[][] {
   const spreads: number[][] = [];
   let i = 0;
 

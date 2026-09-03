@@ -1,7 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import VolumeCard from "../components/VolumeCard.astro";
-import { getMangaLibraryCounts, getMangaVolumes } from "../lib/db";
+import { getMangaLibraryCounts, getMangaVolumes } from "@read-vagabond/db";
 
 const { volumeCount, chapterCount } = await getMangaLibraryCounts();
 const volumes = await getMangaVolumes();

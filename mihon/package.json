@@ -7,6 +7,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
+    "@readbagabondo/db": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.12.23"
   },

@@ -1,12 +1,13 @@
 import { Hono } from "hono";
 import { trimTrailingSlash } from "hono/trailing-slash";
-import { createDb, type Db } from "../../db";
 import {
+  createDb,
+  type Db,
   getMangaById,
   getMangaChapterByMangaIdAndChapterId,
   getMangaChaptersByMangaId,
   getMangas,
-} from "../../db/queries";
+} from "@readbagabondo/db";
 
 const app = new Hono<{
   Bindings: CloudflareBindings;
@@ -46,7 +47,7 @@ app.get("/mangas", async (c) => {
 
 app.get("/mangas/:mangaId", async (c) => {
   const { mangaId } = c.req.param();
-  const manga = await getMangaById(c.var.db, Number(mangaId));
+  const manga = await getMangaById(Number(mangaId), c.var.db);
   if (!manga) {
     return c.text("Manga not found", 404);
   }
@@ -59,7 +60,7 @@ app.get("/mangas/:mangaId", async (c) => {
 
 app.get("/mangas/:mangaId/chapters", async (c) => {
   const { mangaId } = c.req.param();
-  const chapters = await getMangaChaptersByMangaId(c.var.db, Number(mangaId));
+  const chapters = await getMangaChaptersByMangaId(Number(mangaId), c.var.db);
   if (!chapters) {
     return c.text("Manga not found", 404);
   }
@@ -74,9 +75,9 @@ app.get("/mangas/:mangaId/chapters", async (c) => {
 app.get("/mangas/:mangaId/chapters/:chapterId", async (c) => {
   const { mangaId, chapterId } = c.req.param();
   const chapter = await getMangaChapterByMangaIdAndChapterId(
-    c.var.db,
     Number(mangaId),
     Number(chapterId),
+    c.var.db,
   );
   if (!chapter) {
     return c.text("Chapter not found", 404);

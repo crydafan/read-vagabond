@@ -1,21 +1,18 @@
 import { sql, and, eq, asc, desc, countDistinct, min, max } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
-import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import { db, type Database } from "./client";
 import {
   authorsTable,
   chaptersTable,
   mangasTable,
   volumesTable,
 } from "./schema";
-import type * as schema from "./schema";
-
-type Database = BaseSQLiteDatabase<"async", unknown, typeof schema>;
 
 const authorAlias = alias(authorsTable, "author");
 const artistAlias = alias(authorsTable, "artist");
 
-export const getMangas = async (db: Database) => {
-  const data = await db
+export const getMangas = async (database: Database = db) => {
+  const data = await database
     .select({
       id: mangasTable.id,
       author: authorAlias.name,
@@ -31,8 +28,11 @@ export const getMangas = async (db: Database) => {
   return data;
 };
 
-export const getMangaById = async (db: Database, mangaId: number) => {
-  const data = await db
+export const getMangaById = async (
+  mangaId: number,
+  database: Database = db,
+) => {
+  const data = await database
     .select({
       id: mangasTable.id,
       title: mangasTable.title,
@@ -49,8 +49,8 @@ export const getMangaById = async (db: Database, mangaId: number) => {
   return data[0];
 };
 
-export const getMangaLibraryCounts = async (db: Database) => {
-  const data = await db
+export const getMangaLibraryCounts = async (database: Database = db) => {
+  const data = await database
     .select({
       volumeCount: countDistinct(volumesTable.id).as("volumeCount"),
       chapterCount: sql<number>`(SELECT COUNT(*) FROM ${chaptersTable})`.as(
@@ -61,8 +61,8 @@ export const getMangaLibraryCounts = async (db: Database) => {
   return data[0];
 };
 
-export const getMangaVolumes = async (db: Database) => {
-  const data = await db
+export const getMangaVolumes = async (database: Database = db) => {
+  const data = await database
     .select({
       number: volumesTable.number,
       releaseDate: min(chaptersTable.releaseDate).as("releaseDate"),
@@ -77,8 +77,11 @@ export const getMangaVolumes = async (db: Database) => {
   return data;
 };
 
-export const getMangaVolumeById = async (db: Database, volumeId: number) => {
-  const data = await db
+export const getMangaVolumeById = async (
+  volumeId: number,
+  database: Database = db,
+) => {
+  const data = await database
     .select({
       number: volumesTable.number,
       releaseDate: min(chaptersTable.releaseDate).as("releaseDate"),
@@ -94,10 +97,10 @@ export const getMangaVolumeById = async (db: Database, volumeId: number) => {
 };
 
 export const getMangaVolumeByNumber = async (
-  db: Database,
   volumeNumber: number,
+  database: Database = db,
 ) => {
-  const data = await db
+  const data = await database
     .select({
       number: volumesTable.number,
       releaseDate: min(chaptersTable.releaseDate).as("releaseDate"),
@@ -113,10 +116,10 @@ export const getMangaVolumeByNumber = async (
 };
 
 export const getMangaChaptersByVolumeId = async (
-  db: Database,
   volumeId: number,
+  database: Database = db,
 ) => {
-  const data = await db
+  const data = await database
     .select({
       number: chaptersTable.number,
       title: chaptersTable.title,
@@ -129,10 +132,10 @@ export const getMangaChaptersByVolumeId = async (
 };
 
 export const getMangaChaptersByVolumeNumber = async (
-  db: Database,
   volumeNumber: number,
+  database: Database = db,
 ) => {
-  const data = await db
+  const data = await database
     .select({
       number: chaptersTable.number,
       title: chaptersTable.title,
@@ -145,8 +148,11 @@ export const getMangaChaptersByVolumeNumber = async (
   return data;
 };
 
-export const getMangaChapterById = async (db: Database, chapterId: number) => {
-  const data = await db
+export const getMangaChapterById = async (
+  chapterId: number,
+  database: Database = db,
+) => {
+  const data = await database
     .select({
       title: chaptersTable.title,
       number: chaptersTable.number,
@@ -159,10 +165,10 @@ export const getMangaChapterById = async (db: Database, chapterId: number) => {
 };
 
 export const getMangaChapterByNumber = async (
-  db: Database,
   chapterNumber: number,
+  database: Database = db,
 ) => {
-  const data = await db
+  const data = await database
     .select({
       title: chaptersTable.title,
       number: chaptersTable.number,
@@ -175,10 +181,10 @@ export const getMangaChapterByNumber = async (
 };
 
 export const getMangaChaptersByMangaId = async (
-  db: Database,
   mangaId: number,
+  database: Database = db,
 ) => {
-  const data = await db
+  const data = await database
     .select({
       id: chaptersTable.id,
       number: chaptersTable.number,
@@ -196,11 +202,11 @@ export const getMangaChaptersByMangaId = async (
 };
 
 export const getMangaChapterByMangaIdAndChapterId = async (
-  db: Database,
   mangaId: number,
   chapterId: number,
+  database: Database = db,
 ) => {
-  const data = await db
+  const data = await database
     .select({
       id: chaptersTable.id,
       number: chaptersTable.number,

@@ -8,7 +8,7 @@ import {
   getMangaChaptersByVolumeNumber,
   getMangaVolumeByNumber,
   getMangaVolumes,
-} from "../../lib/db";
+} from "@read-vagabond/db";
 
 export const getStaticPaths = (async () => {
   const volumes = await getMangaVolumes();

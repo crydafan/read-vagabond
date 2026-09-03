@@ -26,17 +26,17 @@ pnpm astro <command>  # Run any Astro CLI command
 
 ### Database Commands
 
-The reader reads from a local SQLite file (`local.db`, committed to the repo) via Drizzle ORM. Schema is defined in `src/db/schema.ts`; the Drizzle client is in `src/db/client.ts`.
+The database layer is encapsulated in `@read-vagabond/db` (`packages/db/`). The reader reads from a local SQLite file (`local.db`, committed to the repo) via Drizzle ORM. Schema is defined in `packages/db/src/schema.ts`, queries in `packages/db/src/queries.ts`, and the Drizzle client in `packages/db/src/client.ts`.
 
 ```bash
-# Generate a migration from schema changes (src/db/schema.ts)
-pnpm drizzle-kit generate
+# Generate a migration from schema changes (packages/db/src/schema.ts)
+pnpm db:generate
 
 # Apply migrations to local.db
-pnpm drizzle-kit migrate
+pnpm db:migrate
 
 # Inspect/browse the database
-pnpm drizzle-kit studio
+pnpm db:studio
 ```
 
 Seeds live in `seeds/` and are applied directly to the SQLite file:
@@ -58,13 +58,13 @@ No dedicated test framework is currently configured. Manual testing should be pe
 ## Architecture & Tech Stack
 
 - **Framework**: Astro v6 with `output: "static"` (SSG)
-- **Database**: Local SQLite (`local.db`) accessed at build time via Drizzle ORM + `@libsql/client`
+- **Database**: Local SQLite (`local.db`) accessed at build time via `@read-vagabond/db` (Drizzle ORM + `@libsql/client`)
 - **Migrations**: drizzle-kit, output to `drizzle/migrations/`
 - **Image CDN**: Bunny CDN (`https://vagabond.b-cdn.net/`)
 - **Styling**: Tailwind CSS v4 (via `@tailwindcss/vite`) with Flowbite components
 - **State**: nanostores (reader UI state)
 - **Mihon API**: separate Cloudflare Worker (`mihon/`) built with Hono, backed by D1
-- **Package manager**: pnpm workspace (`pnpm-workspace.yaml`) — root reader app + `mihon` worker
+- **Package manager**: pnpm workspace (`pnpm-workspace.yaml`) — root reader app + `packages/db` + `mihon` worker
 
 ## Code Style Guidelines
 
@@ -81,10 +81,20 @@ src/
 ├── layouts/                        # BaseLayout, MainLayout, ChapterLayout
 ├── components/                     # UI components (.astro)
 ├── feature/reader/store.ts         # nanostores reader state
-├── lib/                            # Data access (db.ts), page URLs (page.ts), metadata
-├── db/                             # Drizzle: schema.ts + client.ts
+├── lib/                            # Page URLs (page.ts), metadata
 ├── styles/                         # Global styles and Tailwind imports
 └── env.d.ts                        # Astro client type reference
+
+packages/
+└── db/                             # @read-vagabond/db (schema, client, queries, drizzle config)
+    ├── src/
+    │   ├── schema.ts
+    │   ├── client.ts
+    │   ├── queries.ts
+    │   └── index.ts
+    ├── drizzle.config.ts
+    ├── package.json
+    └── tsconfig.json
 
 drizzle/migrations/                 # Generated SQL migrations
 seeds/                              # SQL seed data for local.db
@@ -94,7 +104,8 @@ manga/                              # Image source + bunny-upload.sh (rclone -> 
 
 ### Imports
 
-- Use relative imports for internal modules: `import { getMangaVolumes } from "../lib/db"`
+- Use package import for database: `import { getMangaVolumes } from "@read-vagabond/db"`
+- Use relative imports for internal modules: `import { buildPageUrl } from "../lib/page"`
 - Use absolute imports for dependencies: `import type { GetStaticPaths } from "astro"`
 - Group imports: 1) Astro imports, 2) third-party, 3) local imports
 - Type imports use `import type` when possible
@@ -115,10 +126,10 @@ manga/                              # Image source + bunny-upload.sh (rclone -> 
 
 ### Database Operations (Drizzle ORM)
 
-- Import the shared client from `src/db/client.ts` (`db`) and tables from `src/db/schema.ts`
-- All query helpers live in `src/lib/db.ts` — add new queries there rather than querying inline in pages
+- Import queries and schema from `@read-vagabond/db`
+- All query helpers live in `packages/db/src/queries.ts` — add new queries there rather than querying inline in pages
 - Use Drizzle's query builder (`db.select(...).from(...).where(eq(...))`); avoid raw SQL except where aggregation requires it
-- Table aliases (e.g. author/artist on `authorsTable`) are defined in `src/lib/db.ts`
+- Table aliases (e.g. author/artist on `authorsTable`) are defined in `packages/db/src/queries.ts`
 - Helpers return a single row or `undefined` for by-id/by-number lookups; handle the empty case in the caller
 
 ### Styling Guidelines

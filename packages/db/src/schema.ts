@@ -74,3 +74,8 @@ export const chaptersTable = sqliteTable(
     index("chapters_number_idx").on(table.number),
   ],
 );
+
+export type Author = typeof authorsTable.$inferSelect;
+export type Manga = typeof mangasTable.$inferSelect;
+export type Volume = typeof volumesTable.$inferSelect;
+export type Chapter = typeof chaptersTable.$inferSelect;

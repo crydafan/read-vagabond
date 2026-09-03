@@ -1,23 +1,22 @@
 {
-  "name": "read-vagabond",
+  "name": "readbagabondo",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "db:generate": "pnpm --filter @readbagabondo/db db:generate",
+    "db:migrate": "pnpm --filter @readbagabondo/db db:migrate",
+    "db:studio": "pnpm --filter @readbagabondo/db db:studio"
   },
   "dependencies": {
-    "@libsql/client": "^0.17.3",
+    "@readbagabondo/db": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^6.3.8",
-    "drizzle-orm": "^0.45.1",
     "flowbite": "^4.0.1",
     "nanostores": "^1.1.0",
     "tailwindcss": "^4.1.18"
-  },
-  "devDependencies": {
-    "drizzle-kit": "^0.31.8"
   }
 }

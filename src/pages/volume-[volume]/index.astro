@@ -5,13 +5,14 @@ import VolumeCover from "../../components/VolumeCover.astro";
 import VolumeInformation from "../../components/VolumeInformation.astro";
 import MainLayout from "../../layouts/MainLayout.astro";
 import {
+  db,
   getMangaChaptersByVolumeNumber,
   getMangaVolumeByNumber,
   getMangaVolumes,
 } from "@readbagabondo/db";
 
 export const getStaticPaths = (async () => {
-  const volumes = await getMangaVolumes();
+  const volumes = await getMangaVolumes(db);
   const paths = volumes.map((volume) => ({
     params: { volume: String(volume.number) },
   }));
@@ -24,12 +25,15 @@ if (!volumeNumber) {
   return Astro.redirect("/");
 }
 
-const volume = await getMangaVolumeByNumber(+volumeNumber);
+const volume = await getMangaVolumeByNumber(+volumeNumber, db);
 if (!volume) {
   return Astro.redirect("/");
 }
 
-const chaptersFromVolume = await getMangaChaptersByVolumeNumber(+volumeNumber);
+const chaptersFromVolume = await getMangaChaptersByVolumeNumber(
+  +volumeNumber,
+  db,
+);
 ---
 
 <MainLayout

@@ -18,6 +18,12 @@
       "types": "./src/queries.ts"
     }
   },
+  "imports": {
+    "#client": {
+      "workerd": "./src/client-workerd.ts",
+      "default": "./src/client.ts"
+    }
+  },
   "scripts": {
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

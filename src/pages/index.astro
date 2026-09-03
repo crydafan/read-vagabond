@@ -1,10 +1,10 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import VolumeCard from "../components/VolumeCard.astro";
-import { getMangaLibraryCounts, getMangaVolumes } from "@readbagabondo/db";
+import { db, getMangaLibraryCounts, getMangaVolumes } from "@readbagabondo/db";
 
-const { volumeCount, chapterCount } = await getMangaLibraryCounts();
-const volumes = await getMangaVolumes();
+const { volumeCount, chapterCount } = await getMangaLibraryCounts(db);
+const volumes = await getMangaVolumes(db);
 ---
 
 <MainLayout

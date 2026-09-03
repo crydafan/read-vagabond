@@ -1,6 +1,6 @@
 import { sql, and, eq, asc, desc, countDistinct, min, max } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
-import { db, type Database } from "./client";
+import { type Database } from "./types";
 import {
   authorsTable,
   chaptersTable,
@@ -11,7 +11,7 @@ import {
 const authorAlias = alias(authorsTable, "author");
 const artistAlias = alias(authorsTable, "artist");
 
-export const getMangas = async (database: Database = db) => {
+export const getMangas = async (database: Database) => {
   const data = await database
     .select({
       id: mangasTable.id,
@@ -28,10 +28,7 @@ export const getMangas = async (database: Database = db) => {
   return data;
 };
 
-export const getMangaById = async (
-  mangaId: number,
-  database: Database = db,
-) => {
+export const getMangaById = async (mangaId: number, database: Database) => {
   const data = await database
     .select({
       id: mangasTable.id,
@@ -49,7 +46,7 @@ export const getMangaById = async (
   return data[0];
 };
 
-export const getMangaLibraryCounts = async (database: Database = db) => {
+export const getMangaLibraryCounts = async (database: Database) => {
   const data = await database
     .select({
       volumeCount: countDistinct(volumesTable.id).as("volumeCount"),
@@ -61,7 +58,7 @@ export const getMangaLibraryCounts = async (database: Database = db) => {
   return data[0];
 };
 
-export const getMangaVolumes = async (database: Database = db) => {
+export const getMangaVolumes = async (database: Database) => {
   const data = await database
     .select({
       number: volumesTable.number,
@@ -79,7 +76,7 @@ export const getMangaVolumes = async (database: Database = db) => {
 
 export const getMangaVolumeById = async (
   volumeId: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -98,7 +95,7 @@ export const getMangaVolumeById = async (
 
 export const getMangaVolumeByNumber = async (
   volumeNumber: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -117,7 +114,7 @@ export const getMangaVolumeByNumber = async (
 
 export const getMangaChaptersByVolumeId = async (
   volumeId: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -133,7 +130,7 @@ export const getMangaChaptersByVolumeId = async (
 
 export const getMangaChaptersByVolumeNumber = async (
   volumeNumber: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -150,7 +147,7 @@ export const getMangaChaptersByVolumeNumber = async (
 
 export const getMangaChapterById = async (
   chapterId: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -166,7 +163,7 @@ export const getMangaChapterById = async (
 
 export const getMangaChapterByNumber = async (
   chapterNumber: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -182,7 +179,7 @@ export const getMangaChapterByNumber = async (
 
 export const getMangaChaptersByMangaId = async (
   mangaId: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({
@@ -204,7 +201,7 @@ export const getMangaChaptersByMangaId = async (
 export const getMangaChapterByMangaIdAndChapterId = async (
   mangaId: number,
   chapterId: number,
-  database: Database = db,
+  database: Database,
 ) => {
   const data = await database
     .select({

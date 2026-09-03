@@ -5,11 +5,12 @@ import {
   getMangaVolumeByNumber,
   getMangaChapterByNumber,
   getMangaVolumes,
+  db,
 } from "@readbagabondo/db";
 import { buildPageUrl } from "../../../lib/page";
 
 export const getStaticPaths = (async () => {
-  const volumes = await getMangaVolumes();
+  const volumes = await getMangaVolumes(db);
   const paths: { params: { volume: string; chapter: string } }[] = [];
 
   for (const volume of volumes) {
@@ -39,12 +40,12 @@ if (!volumeNumber || !chapterNumber) {
   return Astro.redirect("/");
 }
 
-const volume = await getMangaVolumeByNumber(+volumeNumber);
+const volume = await getMangaVolumeByNumber(+volumeNumber, db);
 if (!volume) {
   return Astro.redirect("/");
 }
 
-const chapter = await getMangaChapterByNumber(+chapterNumber);
+const chapter = await getMangaChapterByNumber(+chapterNumber, db);
 if (!chapter) {
   return Astro.redirect(`/volume-${volume.number}`);
 }

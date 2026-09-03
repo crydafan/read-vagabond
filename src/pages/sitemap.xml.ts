@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getMangaVolumes } from "@readbagabondo/db";
+import { db, getMangaVolumes } from "@readbagabondo/db";
 
 interface SitemapUrl {
   loc: string;
@@ -10,7 +10,7 @@ interface SitemapUrl {
 
 export const GET: APIRoute = async () => {
   const siteUrl = "https://readbagabondo.com";
-  const volumes = await getMangaVolumes();
+  const volumes = await getMangaVolumes(db);
 
   const urls: SitemapUrl[] = [];
 

@@ -12,6 +12,7 @@
     "db:studio": "pnpm --filter @readbagabondo/db db:studio"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.3",
     "@readbagabondo/db": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^6.3.8",

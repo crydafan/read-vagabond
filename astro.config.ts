@@ -13,6 +13,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
       rollupOptions: {
+        external: ["@libsql/client"],
         output: {
           manualChunks: undefined,
         },

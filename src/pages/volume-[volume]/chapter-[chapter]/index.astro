@@ -5,7 +5,7 @@ import {
   getMangaVolumeByNumber,
   getMangaChapterByNumber,
   getMangaVolumes,
-} from "@read-vagabond/db";
+} from "@readbagabondo/db";
 import { buildPageUrl } from "../../../lib/page";
 
 export const getStaticPaths = (async () => {
@@ -61,7 +61,6 @@ const nextChapter = chapter.number < lastChapter ? chapter.number + 1 : null;
 
 const pagesUrl = Array.from({ length: chapter.pageCount }, (_, i) =>
   buildPageUrl({
-    volume: volume.number,
     chapter: chapter.number,
     page: i + 1,
   }),

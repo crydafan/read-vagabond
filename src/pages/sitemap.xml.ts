@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getMangaVolumes } from "@read-vagabond/db";
+import { getMangaVolumes } from "@readbagabondo/db";
 
 interface SitemapUrl {
   loc: string;

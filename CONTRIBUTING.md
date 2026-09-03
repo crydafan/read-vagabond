@@ -1,14 +1,12 @@
-# Contributing to Read Vagabond Manga
+# Contributing to readbagabondo
 
-Thank you for your interest in contributing to Read Vagabond Manga! We welcome all contributions and are excited to have you join our project.
+Thank you for your interest in contributing to readbagabondo! We welcome all contributions and are excited to have you join our project.
 
 ## Project Overview
 
-Read Vagabond Manga is a manga reader web application for Takehiko Inoue's masterpiece Vagabond. Built with Astro and deployed on Cloudflare Workers, it provides a minimalist, high-quality reading experience using D1 database for metadata and R2 for image storage.
+readbagabondo is a manga reader web application for Takehiko Inoue's masterpiece Vagabond. Built with Astro and deployed on Cloudflare Workers, it provides a minimalist, high-quality reading experience using D1 database for metadata and R2 for image storage.
 
-> **Important**: This software is licensed under the MIT License, but this license does NOT grant any rights to manga content. Vagabond © Takehiko Inoue / Kodansha. This site is unofficial and provides content for personal reference only. All rights remain with the original creators and publishers.
-
-**NO SCANS ARE PROVIDED IN THIS REPOSITORY.**
+This software is licensed under the MIT License, but this license does NOT grant any rights to manga content. Vagabond © Takehiko Inoue / Kodansha. This site is unofficial and provides content for personal reference only. All rights remain with the original creators and publishers.
 
 ## Current Development Priorities
 

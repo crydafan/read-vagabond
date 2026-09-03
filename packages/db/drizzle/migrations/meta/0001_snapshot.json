@@ -93,17 +93,12 @@
       "indexes": {
         "chapters_number_idx": {
           "name": "chapters_number_idx",
-          "columns": [
-            "number"
-          ],
+          "columns": ["number"],
           "isUnique": false
         },
         "chapters_volume_id_number_unique": {
           "name": "chapters_volume_id_number_unique",
-          "columns": [
-            "volume_id",
-            "number"
-          ],
+          "columns": ["volume_id", "number"],
           "isUnique": true
         }
       },
@@ -112,12 +107,8 @@
           "name": "chapters_volume_id_volumes_id_fk",
           "tableFrom": "chapters",
           "tableTo": "volumes",
-          "columnsFrom": [
-            "volume_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["volume_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -183,10 +174,7 @@
       "indexes": {
         "mangas_author_id_title_unique": {
           "name": "mangas_author_id_title_unique",
-          "columns": [
-            "author_id",
-            "title"
-          ],
+          "columns": ["author_id", "title"],
           "isUnique": true
         }
       },
@@ -195,12 +183,8 @@
           "name": "mangas_author_id_authors_id_fk",
           "tableFrom": "mangas",
           "tableTo": "authors",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["author_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -208,12 +192,8 @@
           "name": "mangas_artist_id_authors_id_fk",
           "tableFrom": "mangas",
           "tableTo": "authors",
-          "columnsFrom": [
-            "artist_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["artist_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -265,9 +245,7 @@
       "indexes": {
         "volumes_number_idx": {
           "name": "volumes_number_idx",
-          "columns": [
-            "number"
-          ],
+          "columns": ["number"],
           "isUnique": false
         }
       },
@@ -276,12 +254,8 @@
           "name": "volumes_manga_id_mangas_id_fk",
           "tableFrom": "volumes",
           "tableTo": "mangas",
-          "columnsFrom": [
-            "manga_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["manga_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

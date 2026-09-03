@@ -165,9 +165,9 @@ The reader uses nanostores for lightweight reactive client-side state.
 **Location**: `src/feature/reader/store.ts`
 
 ```typescript
-const currentPage = atom<number>(0);          // Current page index
-const percentageRead = atom<number>(0);        // Reading progress percentage
-const navbarVisibility = atom<boolean>(true);  // UI navbar toggle
+const currentPage = atom<number>(0); // Current page index
+const percentageRead = atom<number>(0); // Reading progress percentage
+const navbarVisibility = atom<boolean>(true); // UI navbar toggle
 const isProgrammaticScroll = atom<boolean>(false); // Scroll source flag
 ```
 

@@ -1,0 +1,5 @@
+manga
+node_modules
+dist
+build
+.astro

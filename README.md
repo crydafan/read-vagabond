@@ -1,14 +1,11 @@
-# read-vagabond
+# readbagabondo
 
 Enjoy reading Takehiko Inoue's masterpiece!
 
-This software is a manga reader application. The code is licensed under the MIT License, but this license does NOT grant any rights to manga content.
+This is an unofficial manga reader application. The source code is licensed under the MIT License; however, this license does not grant any rights
+to the manga or its content, and no scans are provided in this repository.
 
-```
 Vagabond © Takehiko Inoue / Kodansha.
-Licensed in your region by publishers such as Viz Media (North America) or Ivrea (Spain).
-This site is unofficial and provides content for personal reference only. All rights remain
-with the original creators and publishers. Please support the official editions.
-```
-
- **NO SCANS ARE PROVIDED IN THIS REPOSITORY.**
+The series is licensed in various regions by publishers such as Viz Media in North America and Ivrea in Spain. This site is unofficial and
+provides content for personal reference only. All rights to Vagabond and its contents remain with their respective creators, publishers, and
+rights holders. Please support the official releases.

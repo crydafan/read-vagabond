@@ -26,7 +26,7 @@ pnpm astro <command>  # Run any Astro CLI command
 
 ### Database Commands
 
-The database layer is encapsulated in `@read-vagabond/db` (`packages/db/`). The reader reads from a local SQLite file (`local.db`, committed to the repo) via Drizzle ORM. Schema is defined in `packages/db/src/schema.ts`, queries in `packages/db/src/queries.ts`, and the Drizzle client in `packages/db/src/client.ts`.
+The database layer is encapsulated in `@readbagabondo/db` (`packages/db/`). The reader reads from a local SQLite file (`packages/db/local.db`, committed to the repo) via Drizzle ORM. Schema is defined in `packages/db/src/schema.ts`, queries in `packages/db/src/queries.ts`, and the Drizzle client in `packages/db/src/client.ts`.
 
 ```bash
 # Generate a migration from schema changes (packages/db/src/schema.ts)
@@ -39,13 +39,13 @@ pnpm db:migrate
 pnpm db:studio
 ```
 
-Seeds live in `seeds/` and are applied directly to the SQLite file:
+Seeds live in `packages/db/seeds/` and are applied directly to the SQLite file:
 
 ```bash
-sqlite3 local.db < seeds/0000_seed_vagabond_metadata.sql
+sqlite3 packages/db/local.db < packages/db/seeds/0000_seed_vagabond_metadata.sql
 ```
 
-Because the static build reads `local.db` at build time, the database file is committed so builds are reproducible. Regenerate/seed it locally if you change the schema or data, then commit the updated `local.db`.
+Because the static build reads `packages/db/local.db` at build time, the database file is committed so builds are reproducible. Regenerate/seed it locally if you change the schema or data, then commit the updated `packages/db/local.db`.
 
 ### Testing
 
@@ -58,8 +58,8 @@ No dedicated test framework is currently configured. Manual testing should be pe
 ## Architecture & Tech Stack
 
 - **Framework**: Astro v6 with `output: "static"` (SSG)
-- **Database**: Local SQLite (`local.db`) accessed at build time via `@read-vagabond/db` (Drizzle ORM + `@libsql/client`)
-- **Migrations**: drizzle-kit, output to `drizzle/migrations/`
+- **Database**: Local SQLite (`packages/db/local.db`) accessed at build time via `@readbagabondo/db` (Drizzle ORM + `@libsql/client`)
+- **Migrations**: drizzle-kit, output to `packages/db/drizzle/migrations/`
 - **Image CDN**: Bunny CDN (`https://vagabond.b-cdn.net/`)
 - **Styling**: Tailwind CSS v4 (via `@tailwindcss/vite`) with Flowbite components
 - **State**: nanostores (reader UI state)
@@ -86,25 +86,27 @@ src/
 └── env.d.ts                        # Astro client type reference
 
 packages/
-└── db/                             # @read-vagabond/db (schema, client, queries, drizzle config)
+└── db/                             # @readbagabondo/db (schema, client, queries, drizzle config)
     ├── src/
     │   ├── schema.ts
     │   ├── client.ts
     │   ├── queries.ts
     │   └── index.ts
+    ├── drizzle/
+    │   └── migrations/             # Generated SQL migrations
+    ├── seeds/                      # SQL seed data for local.db
     ├── drizzle.config.ts
+    ├── local.db                    # Committed SQLite database for SSG build
     ├── package.json
     └── tsconfig.json
 
-drizzle/migrations/                 # Generated SQL migrations
-seeds/                              # SQL seed data for local.db
 mihon/                              # Cloudflare Worker (Hono) for the extension API
 manga/                              # Image source + bunny-upload.sh (rclone -> Bunny CDN)
 ```
 
 ### Imports
 
-- Use package import for database: `import { getMangaVolumes } from "@read-vagabond/db"`
+- Use package import for database: `import { getMangaVolumes } from "@readbagabondo/db"`
 - Use relative imports for internal modules: `import { buildPageUrl } from "../lib/page"`
 - Use absolute imports for dependencies: `import type { GetStaticPaths } from "astro"`
 - Group imports: 1) Astro imports, 2) third-party, 3) local imports
@@ -126,7 +128,7 @@ manga/                              # Image source + bunny-upload.sh (rclone -> 
 
 ### Database Operations (Drizzle ORM)
 
-- Import queries and schema from `@read-vagabond/db`
+- Import queries and schema from `@readbagabondo/db`
 - All query helpers live in `packages/db/src/queries.ts` — add new queries there rather than querying inline in pages
 - Use Drizzle's query builder (`db.select(...).from(...).where(eq(...))`); avoid raw SQL except where aggregation requires it
 - Table aliases (e.g. author/artist on `authorsTable`) are defined in `packages/db/src/queries.ts`

@@ -68,14 +68,9 @@ cd read-vagabond
 # 3. Install dependencies
 pnpm install
 
-# 4. Set up local D1 database (required for development)
-# Run all migrations first, then all seeds
-for migration in drizzle/migrations/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$migration"
-done
-for seed in seeds/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$seed"
-done
+# 4. Set up local SQLite database (packages/db/local.db is committed and ready)
+# If regenerating from seeds:
+sqlite3 packages/db/local.db < packages/db/seeds/0000_seed_vagabond_metadata.sql
 
 # 5. Create a feature branch from main
 git checkout main
@@ -85,65 +80,39 @@ git checkout -b feat/your-feature-name
 # git checkout -b feat/single-page-reader
 # git checkout -b feat/dark-mode
 # git checkout -b fix/reading-progress
-# git checkout -b mihon-api-v2/new-endpoints
 
 # 6. Start development server
-pnpm dev               # Local development server with D1 database
-pnpm wrangler dev      # Local development with Workers runtime and D1 database
+pnpm dev               # Local development server for the static reader
 ```
 
 ### Database Setup Details
 
-The application uses Cloudflare D1 database for storing chapter metadata. For local development:
+The application reader is a fully static site (SSG) that reads metadata from a local SQLite database (`packages/db/local.db`) via Drizzle ORM and `@libsql/client`:
 
-- **Local Database**: Runs in memory using `wrangler d1 execute --local`
-- **Database Files**: Migrations are in the `drizzle/migrations/` directory, seeds in `seeds/`
-- **Database Name**: `bagabondo-db` (configured in `wrangler.jsonc`)
-- **Persistence**: Local database state is stored in `.wrangler/state/` directory
-- **Note**: Database is transitioning from `vagabond_db` to `bagabondo_db`; API currently uses legacy `vagabond_db` (temporary during migration)
+- **Database Package**: `@readbagabondo/db` in `packages/db/`
+- **Database File**: `packages/db/local.db` (committed for reproducible builds)
+- **Migrations**: `packages/db/drizzle/migrations/`
+- **Seeds**: `packages/db/seeds/`
 
-**Running Migrations**:
-
-```bash
-# Run all migrations at once
-for migration in drizzle/migrations/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$migration"
-done
-
-# Run all seeds at once
-for seeds in seeds/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$seeds"
-done
-
-# Or run individual migrations
-pnpm wrangler d1 execute bagabondo-db --local --file=./drizzle/migrations/0000_complex_mimic.sql
-pnpm wrangler d1 execute bagabondo-db --local --file=./seeds/0000_seed_from_legacy.sql
-```
-
-**Reset Local Database** (if needed):
+**Database Commands**:
 
 ```bash
-# Remove local database state
-rm -rf .wrangler/state/
+# Generate migrations
+pnpm db:generate
 
-# Re-run migrations
-for migration in drizzle/migrations/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$migration"
-done
+# Apply migrations to local.db
+pnpm db:migrate
 
-# Re-run seeds
-for seeds in seeds/*.sql; do
-  pnpm wrangler d1 execute bagabondo-db --local --file="$seeds"
-done
+# Inspect database
+pnpm db:studio
 ```
 
 ### Development Commands
 
 ```bash
-pnpm dev               # Start local development server with D1 database
-pnpm build             # Build for production
+pnpm dev               # Start Astro development server
+pnpm build             # Build static site to dist/
 pnpm preview           # Preview production build locally
-pnpm wrangler dev      # Local development with Workers runtime and D1 database
 ```
 
 ### Cloudflare Authentication (Optional)
@@ -277,11 +246,13 @@ This project uses **trunk-based development** with `main` as the primary develop
 **If a bug is discovered in production after merge**:
 
 1. **Create hotfix branch from `main`**:
+
    ```bash
    git checkout main
    git pull origin main
    git checkout -b fix/critical-bug-name
    ```
+
 2. **Fix the issue** with minimal changes
 3. **Open PR targeting `main`** with `[HOTFIX]` prefix in title
 4. **Fast-track review** by maintainer
@@ -300,11 +271,13 @@ This project uses **trunk-based development** with `main` as the primary develop
 1. **Fork the repository**
 2. **Clone your fork locally**
 3. **Create feature branch from `main`**:
+
    ```bash
    git checkout main
    git pull origin main
    git checkout -b feat/your-feature-name
    ```
+
 4. **Develop and test your changes locally**
 5. **Push to your fork**: `git push origin feat/your-feature-name`
 6. **Open pull request targeting `main` branch**
